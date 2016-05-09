@@ -1,13 +1,14 @@
 apply plugin: 'com.android.model.library'
 
 model {
+
     android {
         compileSdkVersion 23
         buildToolsVersion "23.0.2"
 
         ndk {
             moduleName "arcade"
-            ldLibs.add("log")
+            ldLibs.addAll(["android", "log"])
             CFlags.add("-DSTDC_HEADERS")
         }
 
@@ -24,7 +25,20 @@ model {
             }
         }
 
+
     }
+
+    android.sources {
+
+        main {
+            jniLibs {
+                source {
+                    srcDirs 'src/main/libs'
+                }
+            }
+        }
+    }
+
 }
 
 
@@ -32,3 +46,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:23.1.1'
 }
+
+
