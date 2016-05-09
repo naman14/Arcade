@@ -1,1 +1,4 @@
 /build
+/src/main/obj
+/src/main/libs
+/src/main/gen

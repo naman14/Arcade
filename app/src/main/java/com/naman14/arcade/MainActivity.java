@@ -6,6 +6,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.naman14.arcade.library.Torch;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -14,6 +16,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Torch torch = new Torch(this);
+        torch.call("main.lua");
     }
 
     @Override
