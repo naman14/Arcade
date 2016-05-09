@@ -8,7 +8,7 @@ LOCAL_MODULE := arcade
 LOCAL_C_INCLUDES += ../include
 
 LOCAL_SRC_FILES := torchdemo.cpp
-
+LOCAL_SHARED_LIBRARIES := libtorchandroid
 LOCAL_LDLIBS := -llog -landroid
 
 include $(BUILD_SHARED_LIBRARY)
@@ -54,4 +54,10 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := libtorch
 LOCAL_SRC_FILES := prebuilts/libtorch.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+# Add prebuilt libgnustl
+include $(CLEAR_VARS)
+LOCAL_MODULE := libgnustl_shared
+LOCAL_SRC_FILES := prebuilts/libgnustl_shared.so
 include $(PREBUILT_SHARED_LIBRARY)

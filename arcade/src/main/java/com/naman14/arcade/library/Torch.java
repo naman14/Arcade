@@ -9,13 +9,10 @@ public class Torch {
     AssetManager assetManager;
     ApplicationInfo info;
 
-    // native method
-    private native String jni_call(AssetManager manager, String path, String luafile);
-
     public Torch(Context myContext) {
         assetManager = myContext.getAssets();
         info = myContext.getApplicationInfo();
-        System.loadLibrary("arcade");
+        System.loadLibrary("torchandroid");
         Log.d("Torch", "Torch() called\n");
     }
 
@@ -23,5 +20,8 @@ public class Torch {
         Log.d("Torch.call(%s)\n", lua);
         return jni_call(assetManager, info.nativeLibraryDir, lua);
     }
+
+    // native method
+    private native String jni_call(AssetManager manager, String path, String luafile);
 
 }
