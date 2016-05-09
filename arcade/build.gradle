@@ -9,7 +9,15 @@ model {
         ndk {
             moduleName "arcade"
             ldLibs.addAll(["android", "log"])
-            CFlags.add("-DSTDC_HEADERS")
+            ldFlags.add("-L src/main/jni/prebuilts/libluat")
+            ldFlags.add("-L src/main/jni/prebuilts/libluajit")
+            ldFlags.add("-L src/main/jni/prebuilts/libTH")
+            ldFlags.add("-L src/main/jni/prebuilts/libTHNN")
+            ldFlags.add("-L src/main/jni/prebuilts/libtorch")
+            ldFlags.add("-L src/main/jni/prebuilts/libnnx")
+            ldFlags.add("-L src/main/jni/prebuilts/libimage")
+            ldFlags.add("-L src/main/jni/prebuilts/libtorchandroid")
+
         }
 
         defaultConfig {
@@ -34,6 +42,14 @@ model {
             jniLibs {
                 source {
                     srcDirs 'src/main/libs'
+                }
+            }
+        }
+
+        main {
+            jni {
+                exportedHeaders {
+                    srcDir "src/main/jni/include"
                 }
             }
         }

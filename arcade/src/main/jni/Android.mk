@@ -5,11 +5,12 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := arcade
 
-LOCAL_C_INCLUDES += ../include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
-LOCAL_SRC_FILES := torchdemo.cpp
-LOCAL_SHARED_LIBRARIES := libtorchandroid
-LOCAL_LDLIBS := -llog -landroid -L prebuilts/
+LOCAL_SRC_FILES := torchdemo.cpp torchandroid.cpp android_fopen.c
+
+LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid
+
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -109,3 +110,5 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libthreadsmain
 LOCAL_SRC_FILES := prebuilts/libthreadsmain.so
 include $(PREBUILT_SHARED_LIBRARY)
+
+
