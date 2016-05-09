@@ -12,7 +12,7 @@ public class Torch {
     public Torch(Context myContext) {
         assetManager = myContext.getAssets();
         info = myContext.getApplicationInfo();
-        System.loadLibrary("torchandroid");
+        System.loadLibrary("arcade");
         Log.d("Torch", "Torch() called\n");
     }
 

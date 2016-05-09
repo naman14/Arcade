@@ -45,7 +45,11 @@ cmd:option('-seed', -1)
 cmd:option('-content_layers', 'relu4_2', 'layers for content')
 cmd:option('-style_layers', 'relu1_1,relu2_1,relu3_1,relu4_1,relu5_1', 'layers for style')
 
-local function main(params)
+
+function stylize(params)
+
+  print("Style image is ",params.style_image)
+
   if params.gpu >= 0 then
     if params.backend ~= 'clnn' then
       require 'cutorch'
@@ -495,6 +499,3 @@ function TVLoss:updateGradInput(input, gradOutput)
   return self.gradInput
 end
 
-
-local params = cmd:parse(arg)
-main(params)

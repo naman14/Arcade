@@ -9,7 +9,7 @@ LOCAL_C_INCLUDES += ../include
 
 LOCAL_SRC_FILES := torchdemo.cpp
 LOCAL_SHARED_LIBRARIES := libtorchandroid
-LOCAL_LDLIBS := -llog -landroid
+LOCAL_LDLIBS := -llog -landroid -L prebuilts/
 
 include $(BUILD_SHARED_LIBRARY)
 
