@@ -6,49 +6,11 @@ require 'optim'
 require 'loadcaffe'
 
 --------------------------------------------------------------------------------
-
-local cmd = torch.CmdLine()
-
--- Basic options
-cmd:option('-style_image', 'examples/inputs/seated-nude.jpg',
-           'Style target image')
-cmd:option('-style_blend_weights', 'nil')
-cmd:option('-content_image', 'examples/inputs/tubingen.jpg',
-           'Content target image')
-cmd:option('-image_size', 512, 'Maximum height / width of generated image')
-cmd:option('-gpu', 0, 'Zero-indexed ID of the GPU to use; for CPU mode set -gpu = -1')
-
--- Optimization options
-cmd:option('-content_weight', 5e0)
-cmd:option('-style_weight', 1e2)
-cmd:option('-tv_weight', 1e-3)
-cmd:option('-num_iterations', 1000)
-cmd:option('-normalize_gradients', false)
-cmd:option('-init', 'random', 'random|image')
-cmd:option('-optimizer', 'lbfgs', 'lbfgs|adam')
-cmd:option('-learning_rate', 1e1)
-
--- Output options
-cmd:option('-print_iter', 50)
-cmd:option('-save_iter', 100)
-cmd:option('-output_image', 'out.png')
-
--- Other options
-cmd:option('-style_scale', 1.0)
-cmd:option('-pooling', 'max', 'max|avg')
-cmd:option('-proto_file', 'models/VGG_ILSVRC_19_layers_deploy.prototxt')
-cmd:option('-model_file', 'models/VGG_ILSVRC_19_layers.caffemodel')
-cmd:option('-backend', 'nn', 'nn|cudnn|clnn')
-cmd:option('-cudnn_autotune', false)
-cmd:option('-seed', -1)
-
-cmd:option('-content_layers', 'relu4_2', 'layers for content')
-cmd:option('-style_layers', 'relu1_1,relu2_1,relu3_1,relu4_1,relu5_1', 'layers for style')
-
-
 function stylize(params)
 
   print("Style image is ",params.style_image)
+  print("Content image is ",params.content_image)
+  print("Num of iterations are ",params.num_iterations)
 
   if params.gpu >= 0 then
     if params.backend ~= 'clnn' then

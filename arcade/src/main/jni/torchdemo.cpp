@@ -7,16 +7,16 @@
 extern "C" {
 
 JNIEXPORT jstring JNICALL
-Java_com_naman14_arcade_library_Torch_jni_1call( JNIEnv* env,
-                                                 jobject thiz,
-                                                 jobject assetManager,
-                                                 jstring nativeLibraryDir_,
-                                                 jstring luaFile_
+Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
+                                                jobject thiz,
+                                                jobject assetManager,
+                                                jstring nativeLibraryDir_,
+                                                jstring luaFile_
 ) {
     D("Hello from C");
     // get native asset manager
-    AAssetManager* manager = AAssetManager_fromJava(env, assetManager);
-    assert( NULL != manager);
+    AAssetManager *manager = AAssetManager_fromJava(env, assetManager);
+    assert(NULL != manager);
     const char *nativeLibraryDir = env->GetStringUTFChars(nativeLibraryDir_, 0);
     const char *file = env->GetStringUTFChars(luaFile_, 0);
 
@@ -27,7 +27,7 @@ Java_com_naman14_arcade_library_Torch_jni_1call( JNIEnv* env,
     buffer[0] = 0;
 
     lua_State *L = inittorch(manager, nativeLibraryDir); // create a lua_State
-    assert( NULL != manager);
+    assert(NULL != manager);
 
     // load and run file
     int ret;
@@ -39,8 +39,8 @@ Java_com_naman14_arcade_library_Torch_jni_1call( JNIEnv* env,
 
     // check if script ran succesfully. If not, print error to logcat
     if (ret == 1) {
-        D("Error doing resource: %s:%s\n", file, lua_tostring(L,-1));
-        strlcat(buffer, lua_tostring(L,-1), sizeof(buffer));
+        D("Error doing resource: %s:%s\n", file, lua_tostring(L, -1));
+        strlcat(buffer, lua_tostring(L, -1), sizeof(buffer));
     }
     else
         strlcat(buffer,
@@ -48,11 +48,29 @@ Java_com_naman14_arcade_library_Torch_jni_1call( JNIEnv* env,
                 sizeof(buffer));
 
     lua_newtable(L);
-    lua_pushstring(L,"lol");
-    lua_setfield(L,-2,"style_image");
+    lua_pushstring(L, "/sdcard/examples/inputs/seated-nude.jpg");
+    lua_setfield(L, -2, "style_image");
+
+    lua_pushstring(L, "/sdcard/examples/inputs/tubingen.jpg");
+    lua_setfield(L, -2, "content_image");
+
+    lua_pushstring(L, "/sdcard/profile.png");
+    lua_setfield(L, -2, "output_image");
+
+    lua_pushinteger(L, -1);
+    lua_setfield(L, -2, "gpu");
+
+    lua_pushinteger(L, -1);
+    lua_setfield(L, -2, "gpu");
+
+    lua_pushinteger(L, 10);
+    lua_setfield(L, -2, "num_iterations");
+
+    lua_pushinteger(L, 256);
+    lua_setfield(L, -2, "image_size");
 
     lua_getglobal(L, "stylize");
-    lua_insert (L, -2);   // swap table and function into correct order for pcall
+    lua_insert(L, -2);   // swap table and function into correct order for pcall
     int result = lua_pcall(L, 1, 0, 0);
 
     // destroy the Lua State
