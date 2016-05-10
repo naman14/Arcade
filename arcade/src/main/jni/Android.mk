@@ -9,7 +9,7 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
 LOCAL_SRC_FILES := torchdemo.cpp torchandroid.cpp android_fopen.c
 
-LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lpng -lpng16
+LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lpng -lpng16 -ljpeg
 
 
 include $(BUILD_SHARED_LIBRARY)
@@ -124,3 +124,8 @@ LOCAL_MODULE := libpng
 LOCAL_SRC_FILES := prebuilts/libpng.so
 include $(PREBUILT_SHARED_LIBRARY)
 
+# Add prebuilt libjpeg
+include $(CLEAR_VARS)
+LOCAL_MODULE := libjpeg
+LOCAL_SRC_FILES := prebuilts/libjpeg.so
+include $(PREBUILT_SHARED_LIBRARY)

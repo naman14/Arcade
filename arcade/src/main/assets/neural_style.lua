@@ -50,8 +50,10 @@ function stylize(params)
   end
 
   local content_image = image.load(params.content_image, 3)
+  print("image laoded")
   content_image = image.scale(content_image, params.image_size, 'bilinear')
   local content_image_caffe = preprocess(content_image):float()
+
 
   local style_size = math.ceil(params.style_scale * params.image_size)
   local style_image_list = params.style_image:split(',')
