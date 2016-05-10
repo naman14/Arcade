@@ -3,6 +3,7 @@ local C = loadcaffe.C
 
 
 loadcaffe.load = function(prototxt_name, binary_name, backend)
+  print("I am here")
   local backend = backend or 'nn'
   local handle = ffi.new('void*[1]')
 

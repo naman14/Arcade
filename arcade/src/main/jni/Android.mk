@@ -1,6 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
-
+include $(call all-subdir-makefiles)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := arcade
@@ -9,7 +9,7 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
 LOCAL_SRC_FILES := torchdemo.cpp torchandroid.cpp android_fopen.c
 
-LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid
+LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lpng -lpng16
 
 
 include $(BUILD_SHARED_LIBRARY)
@@ -111,4 +111,16 @@ LOCAL_MODULE := libthreadsmain
 LOCAL_SRC_FILES := prebuilts/libthreadsmain.so
 include $(PREBUILT_SHARED_LIBRARY)
 
+# Add prebuilt libpng16
+include $(CLEAR_VARS)
+LOCAL_MODULE := libpng16
+LOCAL_SRC_FILES := prebuilts/libpng16.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+
+# Add prebuilt libpng
+include $(CLEAR_VARS)
+LOCAL_MODULE := libpng
+LOCAL_SRC_FILES := prebuilts/libpng.so
+include $(PREBUILT_SHARED_LIBRARY)
 

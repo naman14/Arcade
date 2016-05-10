@@ -48,10 +48,10 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
                 sizeof(buffer));
 
     lua_newtable(L);
-    lua_pushstring(L, "/sdcard/examples/inputs/seated-nude.jpg");
+    lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
     lua_setfield(L, -2, "style_image");
 
-    lua_pushstring(L, "/sdcard/examples/inputs/tubingen.jpg");
+    lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
     lua_setfield(L, -2, "content_image");
 
     lua_pushstring(L, "/sdcard/profile.png");
@@ -68,6 +68,21 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
 
     lua_pushinteger(L, 256);
     lua_setfield(L, -2, "image_size");
+
+    lua_pushstring(L, "adam");
+    lua_setfield(L, -2, "optimizer");
+
+    lua_pushstring(L, "/storage/emulated/0/models/nin_imagenet_conv.caffemodel");
+    lua_setfield(L, -2, "model_file");
+
+    lua_pushstring(L, "/storage/emulated/0/models/train_val.prototxt");
+    lua_setfield(L, -2, "proto_file");
+
+    lua_pushstring(L, "nn");
+    lua_setfield(L, -2, "backend");
+
+    lua_pushstring(L, "nn");
+    lua_setfield(L, -2, "backend");
 
     lua_getglobal(L, "stylize");
     lua_insert(L, -2);   // swap table and function into correct order for pcall

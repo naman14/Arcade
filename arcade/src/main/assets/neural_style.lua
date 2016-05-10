@@ -33,7 +33,11 @@ function stylize(params)
     end
     cudnn.SpatialConvolution.accGradParameters = nn.SpatialConvolutionMM.accGradParameters -- ie: nop
   end
-  
+
+
+  print("Proto model is",params.model_file)
+  print("Proto model is",params.model_file)
+
   local loadcaffe_backend = params.backend
   if params.backend == 'clnn' then loadcaffe_backend = 'nn' end
   local cnn = loadcaffe.load(params.proto_file, params.model_file, loadcaffe_backend):float()
@@ -44,11 +48,11 @@ function stylize(params)
       cnn:cl()
     end
   end
-  
+
   local content_image = image.load(params.content_image, 3)
   content_image = image.scale(content_image, params.image_size, 'bilinear')
   local content_image_caffe = preprocess(content_image):float()
-  
+
   local style_size = math.ceil(params.style_scale * params.image_size)
   local style_image_list = params.style_image:split(',')
   local style_images_caffe = {}
