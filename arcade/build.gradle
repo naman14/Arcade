@@ -9,14 +9,6 @@ model {
         ndk {
             moduleName "arcade"
             ldLibs.addAll(["android", "log"])
-            ldFlags.add("-L src/main/jni/prebuilts/libluat")
-            ldFlags.add("-L src/main/jni/prebuilts/libluajit")
-            ldFlags.add("-L src/main/jni/prebuilts/libTH")
-            ldFlags.add("-L src/main/jni/prebuilts/libTHNN")
-            ldFlags.add("-L src/main/jni/prebuilts/libtorch")
-            ldFlags.add("-L src/main/jni/prebuilts/libnnx")
-            ldFlags.add("-L src/main/jni/prebuilts/libimage")
-            ldFlags.add("-L src/main/jni/prebuilts/libtorchandroid")
 
         }
 
@@ -50,6 +42,9 @@ model {
             jni {
                 exportedHeaders {
                     srcDir "src/main/jni/include"
+                }
+                source {
+                    srcDirs = ['src/main/none'] // [] could be set instead but will disable even symbol resolution inside the editor
                 }
             }
         }
