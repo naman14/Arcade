@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.naman14.arcade.library.Arcade;
+import com.naman14.arcade.library.ArcadeBuilder;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,11 +27,15 @@ public class MainActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                try {
-                    new ModelDownloader().run(MainActivity.this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    new ModelDownloader().run(MainActivity.this);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+                ArcadeBuilder builder = new ArcadeBuilder(MainActivity.this);
+                Arcade arcade = builder.build();
+                arcade.initialize();
+                arcade.stylize();
                 return null;
             }
         }.execute();

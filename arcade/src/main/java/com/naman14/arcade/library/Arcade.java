@@ -11,38 +11,45 @@ public class Arcade {
 
     AssetManager assetManager;
     ApplicationInfo info;
+    ArcadeBuilder builder;
 
     static {
         System.loadLibrary("png16");
         System.loadLibrary("arcade");
     }
 
-    public Arcade(Context context) {
+    public Arcade(Context context, ArcadeBuilder builder) {
+        this.builder = builder;
         assetManager = context.getAssets();
         info = context.getApplicationInfo();
     }
 
-    public Arcade(Context context, ArcadeBuilder builder) {
-
+    public void initialize() {
+        initialize(assetManager, info.nativeLibraryDir, "neural_style.lua");
     }
 
-//    public void call(final String lua) {
-//        Log.d("Torch.call(%s)\n", lua);
-//        new AsyncTask<String, Void, String>() {
-//            @Override
-//            protected String doInBackground(String... params) {
-//                String result = jni_call(assetManager, info.nativeLibraryDir, lua);
-//                return result;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(String s) {
-//                super.onPostExecute(s);
-//            }
-//        }.execute("");
-//    }
+    public void stylize() {
+        stylize(builder.styleimage, builder.contentImage, builder.outputImage, builder.gpu, builder.iterations, builder.imageSize,
+                builder.optimizer, builder.modelFile, builder.protoFIle, builder.backend, builder.styleScale, builder.styleBlendWeights,
+                builder.styleLayers, builder.contentLayers, builder.pooling, builder.tvWeight, builder.styleWeight, builder.contentWeight,
+                builder.seed, builder.learningRate, builder.init, builder.normalizeGradients, builder.printIterations,
+                builder.saveIterations);
+    }
+
+    public void destroyArcade() {
+        destroy();
+    }
 
     // native method
-    private native String stylize(AssetManager manager, String path, String luafile);
+    private native String initialize(AssetManager manager, String path, String luafile);
+
+    private native String stylize(String styleImage, String contentImage, String outputImage, int gpu, int iterations, int imageSize,
+                                  String optimizer, String modelFile, String protoFile, String backend, long styleScale,
+                                  String blendWeights, String styleLayers, String contentLayers,
+                                  String pooling, long tvWeight, long styleWeight, long contentWeight,
+                                  int seed, int learningRate, String init, boolean normalizeGradients,
+                                  int printIterations, int saveIterations);
+
+    private native String destroy();
 
 }
