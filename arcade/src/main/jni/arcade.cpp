@@ -50,76 +50,76 @@ Java_com_naman14_arcade_library_Arcade_stylize(
         jint saveIter) {
 
     lua_newtable(L);
-    lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
+    lua_pushstring(L, styleImage);
     lua_setfield(L, -2, "style_image");
 
-    lua_pushstring(L, "/sdcard/examples/outputs/golden_gate_scream.png");
+    lua_pushstring(L, contentImage);
     lua_setfield(L, -2, "content_image");
 
-    lua_pushstring(L, "/sdcard/profile.png");
+    lua_pushstring(L, outputImage);
     lua_setfield(L, -2, "output_image");
 
-    lua_pushinteger(L, -1);
+    lua_pushinteger(L, gpu);
     lua_setfield(L, -2, "gpu");
 
-    lua_pushinteger(L, 10);
+    lua_pushinteger(L, numIterations);
     lua_setfield(L, -2, "num_iterations");
 
-    lua_pushinteger(L, 256);
+    lua_pushinteger(L, imageSize);
     lua_setfield(L, -2, "image_size");
 
-    lua_pushstring(L, "adam");
+    lua_pushstring(L, optimizer);
     lua_setfield(L, -2, "optimizer");
 
-    lua_pushstring(L, "/storage/emulated/0/models/nin_imagenet_conv.caffemodel");
+    lua_pushstring(L, modelFile);
     lua_setfield(L, -2, "model_file");
 
-    lua_pushstring(L, "/storage/emulated/0/models/train_val.prototxt");
+    lua_pushstring(L, protoFile);
     lua_setfield(L, -2, "proto_file");
 
-    lua_pushstring(L, "nn");
+    lua_pushstring(L, backend);
     lua_setfield(L, -2, "backend");
 
-    luaT_pushlong(L, 1.0);
+    luaT_pushlong(L, styleScale);
     lua_setfield(L, -2, "style_scale");
 
-    lua_pushstring(L, "nil");
+    lua_pushstring(L, styleBlendWeights);
     lua_setfield(L, -2, "style_blend_weights");
 
-    lua_pushstring(L, "relu0,relu3,relu7,relu12");
+    lua_pushstring(L, styleLayers);
     lua_setfield(L, -2, "style_layers");
 
-    lua_pushstring(L, "relu0,relu3,relu7,relu12");
+    lua_pushstring(L, contentLayers);
     lua_setfield(L, -2, "content_layers");
 
-    lua_pushstring(L, "avg");
+    lua_pushstring(L, pooling);
     lua_setfield(L, -2, "pooling");
 
-    luaT_pushlong(L, 0.001);
+    luaT_pushlong(L, tvWeight);
     lua_setfield(L, -2, "tv_weight");
 
-    luaT_pushlong(L, 200);
+    luaT_pushlong(L, styleWeight);
     lua_setfield(L, -2, "style_weight");
 
-    luaT_pushlong(L, 10);
+    luaT_pushlong(L, contentWeight);
     lua_setfield(L, -2, "content_weight");
 
-    lua_pushinteger(L, 123);
+    lua_pushinteger(L, seed);
     lua_setfield(L, -2, "seed");
 
-    lua_pushinteger(L, 10);
+    lua_pushinteger(L, learningRate);
     lua_setfield(L, -2, "learning_rate");
 
-    lua_pushstring(L, "random");
+    lua_pushstring(L, init);
     lua_setfield(L, -2, "init");
 
-    lua_pushboolean(L, false);
+    lua_pushboolean(L, normalizeGradients);
     lua_setfield(L, -2, "normalize_gradients");
 
-    lua_pushinteger(L, 5);
+    lua_pushinteger(L, printIter);
     lua_setfield(L, -2, "print_iter");
 
-    lua_pushinteger(L, 1);
+    lua_pushinteger(L, saveIter);
     lua_setfield(L, -2, "save_iter");
 
     lua_getglobal(L, "stylize");

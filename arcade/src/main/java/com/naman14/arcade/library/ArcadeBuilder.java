@@ -1,9 +1,13 @@
 package com.naman14.arcade.library;
 
+import android.content.Context;
+
 /**
  * Created by naman on 12/05/16.
  */
 public class ArcadeBuilder {
+
+    private Context context;
 
     public String styleimage;
     public String contentImage;
@@ -31,7 +35,30 @@ public class ArcadeBuilder {
     public int saveIterations;
 
 
-    public ArcadeBuilder() {
+    public ArcadeBuilder(Context context) {
+        this.context = context;
+        this.gpu = -1;
+        this.styleimage = "/sdcard/examples/inputs/starry_night_crop.png";
+        this.contentImage = "/sdcard/examples/outputs/golden_gate_scream.png";
+        this.iterations = 5;
+        this.backend = "nn";
+        this.optimizer = "adam";
+        this.imageSize = 256;
+        this.contentLayers = "relu0,relu3,relu7,relu12";
+        this.styleLayers = "relu0,relu3,relu7,relu12";
+        this.protoFIle = "/storage/emulated/0/models/train_val.prototxt";
+        this.modelFile = "/storage/emulated/0/models/nin_imagenet_conv.caffemodel";
+        this.contentWeight = 10;
+        this.styleWeight = 200;
+        this.printIterations = 1;
+        this.saveIterations = 1;
+        this.styleScale = 1L;
+        this.pooling = "avg";
+        this.tvWeight = (long) 0.01;
+        this.seed = 123;
+        this.learningRate = 10;
+        this.init = "random";
+        this.normalizeGradients = false;
 
     }
 
@@ -129,5 +156,9 @@ public class ArcadeBuilder {
 
     public void setSaveIterations(int saveIterations) {
         this.saveIterations = saveIterations;
+    }
+
+    public Arcade build() {
+        return new Arcade(context, this);
     }
 }
