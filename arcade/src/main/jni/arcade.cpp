@@ -6,14 +6,14 @@
 
 extern "C" {
 
+lua_State *L;
+
 JNIEXPORT jstring JNICALL
-Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
-                                                jobject thiz,
-                                                jobject assetManager,
-                                                jstring nativeLibraryDir_,
-                                                jstring luaFile_
-) {
-    D("Hello from C");
+Java_com_naman14_arcade_library_Arcade_initialize(JNIEnv *env,
+                                                  jobject thiz,
+                                                  jobject assetManager,
+                                                  jstring nativeLibraryDir_,
+                                                  jstring luaFile_) {
     // get native asset manager
     AAssetManager *manager = AAssetManager_fromJava(env, assetManager);
     assert(NULL != manager);
@@ -22,14 +22,12 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
 
     char buffer[4096]; // buffer for textview output
 
-    D("Torch.call(%s), nativeLibraryDir=%s", file, nativeLibraryDir);
-
     buffer[0] = 0;
 
-    lua_State *L = inittorch(manager, nativeLibraryDir); // create a lua_State
+    *L = inittorch(manager, nativeLibraryDir); // create a lua_State
     assert(NULL != manager);
 
-    // load and run file
+    // load file
     int ret;
     long size = android_asset_get_size(file);
     if (size != -1) {
@@ -37,15 +35,19 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
         ret = luaL_dobuffer(L, filebytes, size, "main");
     }
 
-    // check if script ran succesfully. If not, print error to logcat
-    if (ret == 1) {
-        D("Error doing resource: %s:%s\n", file, lua_tostring(L, -1));
-        strlcat(buffer, lua_tostring(L, -1), sizeof(buffer));
-    }
-    else
-        strlcat(buffer,
-                "Torch script ran succesfully. Check Logcat for more details.",
-                sizeof(buffer));
+    return env->NewStringUTF(buffer);
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_naman14_arcade_library_Arcade_stylize(
+        JNIEnv *env, jobject thiz, jstring styleImage, jstring contentImage, jstring outputImage,
+        jint gpu, jint numIterations, jint imageSize, jstring optimizer, jstring modelFile,
+        jstring protoFile,
+        jstring backend, jlong styleScale, jstring styleBlendWeights, jstring styleLayers,
+        jstring contentLayers, jstring pooling, jlong tvWeight, jlong styleWeight,
+        jlong contentWeight,
+        jint seed, jint learningRate, jstring init, jboolean normalizeGradients, jint printIter,
+        jint saveIter) {
 
     lua_newtable(L);
     lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
@@ -122,11 +124,16 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
 
     lua_getglobal(L, "stylize");
     lua_insert(L, -2);   // swap table and function into correct order for pcall
+
     int result = lua_pcall(L, 1, 0, 0);
 
-    // destroy the Lua State
-    // lua_close(L);
-    return env->NewStringUTF(buffer);
 }
+
+JNIEXPORT jstring JNICALL
+Java_com_naman14_arcade_library_Arcade_destroy(JNIEnv *env, jobject thiz) {
+    // destroy the Lua State
+    lua_close(L);
+}
+
 }
 

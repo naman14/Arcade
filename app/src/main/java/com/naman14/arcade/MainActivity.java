@@ -7,11 +7,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.naman14.arcade.library.Torch;
+import com.naman14.arcade.library.Arcade;
 
 public class MainActivity extends AppCompatActivity {
 
-    Torch torch;
+    Arcade arcade;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
