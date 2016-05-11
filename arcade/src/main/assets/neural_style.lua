@@ -39,8 +39,10 @@ function stylize(params)
   print("Proto model is",params.model_file)
 
   local loadcaffe_backend = params.backend
+  print("attempting to load model")
   if params.backend == 'clnn' then loadcaffe_backend = 'nn' end
   local cnn = loadcaffe.load(params.proto_file, params.model_file, loadcaffe_backend):float()
+  print("model loaded")
   if params.gpu >= 0 then
     if params.backend ~= 'clnn' then
       cnn:cuda()

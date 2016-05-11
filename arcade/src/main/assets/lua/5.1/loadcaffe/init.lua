@@ -1,9 +1,7 @@
 require 'nn'
-loadcaffe = {}
 
 local ffi = require 'ffi'
-
-local C = loadcaffe.C
+loadcaffe = {}
 
 ffi.cdef[[
 void loadBinary(void** handle, const char* prototxt_name, const char* binary_name);
@@ -14,6 +12,7 @@ void loadModule(void** handle, const char* name, THFloatTensor* weight, THFloatT
 
 loadcaffe.C = ffi.load(package.searchpath('libloadcaffe', package.cpath))
 
+local C = loadcaffe.C
 
 
 loadcaffe.load = function(prototxt_name, binary_name, backend)
@@ -62,5 +61,6 @@ loadcaffe.load = function(prototxt_name, binary_name, backend)
 
     return net
 end
+
 
 return loadcaffe
