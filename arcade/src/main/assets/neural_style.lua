@@ -36,12 +36,13 @@ function stylize(params)
 
 
   print("Proto model is",params.model_file)
-  print("Proto model is",params.model_file)
+  print("Proto file is",params.proto_file)
 
   local loadcaffe_backend = params.backend
   print("attempting to load model")
   if params.backend == 'clnn' then loadcaffe_backend = 'nn' end
   local cnn = loadcaffe.load(params.proto_file, params.model_file, loadcaffe_backend):float()
+  print(#cnn.modules)
   print("model loaded")
   if params.gpu >= 0 then
     if params.backend ~= 'clnn' then
@@ -80,6 +81,7 @@ function stylize(params)
     assert(#style_blend_weights == #style_image_list,
       '-style_blend_weights and -style_images must have the same number of elements')
   end
+
   -- Normalize the style blending weights so they sum to 1
   local style_blend_sum = 0
   for i = 1, #style_blend_weights do
@@ -89,7 +91,6 @@ function stylize(params)
   for i = 1, #style_blend_weights do
     style_blend_weights[i] = style_blend_weights[i] / style_blend_sum
   end
-  
 
   if params.gpu >= 0 then
     if params.backend ~= 'clnn' then
@@ -104,7 +105,7 @@ function stylize(params)
       end
     end
   end
-  
+
   local content_layers = params.content_layers:split(",")
   local style_layers = params.style_layers:split(",")
 
@@ -112,6 +113,7 @@ function stylize(params)
   local content_losses, style_losses = {}, {}
   local next_content_idx, next_style_idx = 1, 1
   local net = nn.Sequential()
+  print(params.tv_weight)
   if params.tv_weight > 0 then
     local tv_mod = nn.TVLoss(params.tv_weight):float()
     if params.gpu >= 0 then
@@ -123,7 +125,8 @@ function stylize(params)
     end
     net:add(tv_mod)
   end
-  for i = 1, #cnn do
+
+  for i = 1, #cnn.modules do
     if next_content_idx <= #content_layers or next_style_idx <= #style_layers then
       local layer = cnn:get(i)
       local name = layer.name
@@ -174,6 +177,7 @@ function stylize(params)
           end
         end
         local target = nil
+        print(#style_images_caffe)
         for i = 1, #style_images_caffe do
           local target_features = net:forward(style_images_caffe[i]):clone()
           local target_i = gram:forward(target_features):clone()
@@ -211,7 +215,7 @@ function stylize(params)
         module.gradBias = nil
     end
   end
-  collectgarbage()
+--  collectgarbage()
   
   -- Initialize the image
   if params.seed >= 0 then
@@ -293,6 +297,7 @@ function stylize(params)
     net:forward(x)
     local grad = net:updateGradInput(x, dy)
     local loss = 0
+    print(ipairs(content_losses))
     for _, mod in ipairs(content_losses) do
       loss = loss + mod.loss
     end
@@ -301,8 +306,6 @@ function stylize(params)
     end
     maybe_print(num_calls, loss)
     maybe_save(num_calls)
-
-    collectgarbage()
     -- optim.lbfgs expects a vector for gradients
     return loss, grad:view(grad:nElement())
   end
@@ -311,11 +314,13 @@ function stylize(params)
   if params.optimizer == 'lbfgs' then
     print('Running optimization with L-BFGS')
     local x, losses = optim.lbfgs(feval, img, optim_state)
+    print("Done")
   elseif params.optimizer == 'adam' then
     print('Running optimization with ADAM')
     for t = 1, params.num_iterations do
       local x, losses = optim.adam(feval, img, optim_state)
     end
+    print("Done")
   end
 end
   

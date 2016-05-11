@@ -3,7 +3,6 @@ package com.naman14.arcade;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -21,20 +20,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         torch = new Torch(this);
+        torch.call("neural_style.lua");
 
-    }
-
-
-    @Override
-    public void onStart()  {
-        super.onStart();
-        Log.d("torchdemo","onStart\n");
-        Runnable r = new Runnable() {
-            public void run() {
-                torch.call("neural_style.lua");
-            }
-        };
-        r.run();
     }
 
     @Override

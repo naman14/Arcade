@@ -60,13 +60,10 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
     lua_pushinteger(L, -1);
     lua_setfield(L, -2, "gpu");
 
-    lua_pushinteger(L, -1);
-    lua_setfield(L, -2, "gpu");
-
-    lua_pushinteger(L, 10);
+    lua_pushinteger(L, 1);
     lua_setfield(L, -2, "num_iterations");
 
-    lua_pushinteger(L, 256);
+    lua_pushinteger(L, 128);
     lua_setfield(L, -2, "image_size");
 
     lua_pushstring(L, "adam");
@@ -81,8 +78,44 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
     lua_pushstring(L, "nn");
     lua_setfield(L, -2, "backend");
 
-    lua_pushstring(L, "nn");
-    lua_setfield(L, -2, "backend");
+    luaT_pushlong(L, 1.0);
+    lua_setfield(L, -2, "style_scale");
+
+    lua_pushstring(L, "nil");
+    lua_setfield(L, -2, "style_blend_weights");
+
+    lua_pushstring(L, "relu0,relu3,relu7,relu12");
+    lua_setfield(L, -2, "style_layers");
+
+    lua_pushstring(L, "relu0,relu3,relu7,relu12");
+    lua_setfield(L, -2, "content_layers");
+
+    lua_pushstring(L, "avg");
+    lua_setfield(L, -2, "pooling");
+
+    luaT_pushlong(L, 0.001);
+    lua_setfield(L, -2, "tv_weight");
+
+    luaT_pushlong(L, 200);
+    lua_setfield(L, -2, "style_weight");
+
+    luaT_pushlong(L, 10);
+    lua_setfield(L, -2, "content_weight");
+
+    lua_pushinteger(L, 123);
+    lua_setfield(L, -2, "seed");
+
+    lua_pushstring(L, "random");
+    lua_setfield(L, -2, "init");
+
+    lua_pushboolean(L, false);
+    lua_setfield(L, -2, "normalize_gradients");
+
+    lua_pushinteger(L, 50);
+    lua_setfield(L, -2, "print_iter");
+
+    lua_pushinteger(L, 50);
+    lua_setfield(L, -2, "save_iter");
 
     lua_getglobal(L, "stylize");
     lua_insert(L, -2);   // swap table and function into correct order for pcall

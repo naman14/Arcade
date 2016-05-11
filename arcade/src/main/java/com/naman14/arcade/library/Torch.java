@@ -1,5 +1,6 @@
 package com.naman14.arcade.library;
 
+import android.os.AsyncTask;
 import android.provider.Settings;
 import android.util.Log;
 import android.content.res.AssetManager;
@@ -18,9 +19,20 @@ public class Torch {
         Log.d("Torch", "Torch() called\n");
     }
 
-    public String call(String lua) {
+    public void call(final String lua) {
         Log.d("Torch.call(%s)\n", lua);
-        return jni_call(assetManager, info.nativeLibraryDir, lua);
+        new AsyncTask<String,Void,String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                String result = jni_call(assetManager, info.nativeLibraryDir, lua);
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+        }.execute("");
     }
 
     // native method
