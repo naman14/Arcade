@@ -282,6 +282,7 @@ function stylize(params)
       if t == params.num_iterations then
         filename = params.output_image
       end
+      print("Saving image")
       image.save(filename, disp)
     end
   end
@@ -318,6 +319,7 @@ function stylize(params)
   elseif params.optimizer == 'adam' then
     print('Running optimization with ADAM')
     for t = 1, params.num_iterations do
+      print(string.format("Doing Iteration %i of %s ...", t, params.num_iterations))
       local x, losses = optim.adam(feval, img, optim_state)
     end
     print("Done")

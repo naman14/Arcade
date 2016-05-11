@@ -7,7 +7,7 @@ LOCAL_MODULE := arcade
 
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
 
-LOCAL_SRC_FILES := neuralandroid.cpp torchandroid.cpp android_fopen.c
+LOCAL_SRC_FILES := neuralandroid.cpp arcade.c torchandroid.cpp android_fopen.c
 
 LOCAL_LDLIBS := -llog -landroid -L$(LOCAL_PATH)/prebuilts -lluaT -lluajit -lTH  -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lluaT -lluajit -lTH -lTHNN  -ltorch -lnnx -limage -ltorchandroid -lpng -lpng16 -ljpeg
 

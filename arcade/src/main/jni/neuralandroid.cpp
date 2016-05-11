@@ -51,7 +51,7 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
     lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
     lua_setfield(L, -2, "style_image");
 
-    lua_pushstring(L, "/sdcard/examples/inputs/starry_night_crop.png");
+    lua_pushstring(L, "/sdcard/examples/outputs/golden_gate_scream.png");
     lua_setfield(L, -2, "content_image");
 
     lua_pushstring(L, "/sdcard/profile.png");
@@ -60,10 +60,10 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
     lua_pushinteger(L, -1);
     lua_setfield(L, -2, "gpu");
 
-    lua_pushinteger(L, 1);
+    lua_pushinteger(L, 10);
     lua_setfield(L, -2, "num_iterations");
 
-    lua_pushinteger(L, 128);
+    lua_pushinteger(L, 256);
     lua_setfield(L, -2, "image_size");
 
     lua_pushstring(L, "adam");
@@ -105,16 +105,19 @@ Java_com_naman14_arcade_library_Torch_jni_1call(JNIEnv *env,
     lua_pushinteger(L, 123);
     lua_setfield(L, -2, "seed");
 
+    lua_pushinteger(L, 10);
+    lua_setfield(L, -2, "learning_rate");
+
     lua_pushstring(L, "random");
     lua_setfield(L, -2, "init");
 
     lua_pushboolean(L, false);
     lua_setfield(L, -2, "normalize_gradients");
 
-    lua_pushinteger(L, 50);
+    lua_pushinteger(L, 5);
     lua_setfield(L, -2, "print_iter");
 
-    lua_pushinteger(L, 50);
+    lua_pushinteger(L, 1);
     lua_setfield(L, -2, "save_iter");
 
     lua_getglobal(L, "stylize");
