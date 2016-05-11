@@ -24,7 +24,7 @@ Java_com_naman14_arcade_library_Arcade_initialize(JNIEnv *env,
 
     buffer[0] = 0;
 
-    *L = inittorch(manager, nativeLibraryDir); // create a lua_State
+    L = inittorch(manager, nativeLibraryDir); // create a lua_State
     assert(NULL != manager);
 
     // load file
@@ -49,14 +49,27 @@ Java_com_naman14_arcade_library_Arcade_stylize(
         jint seed, jint learningRate, jstring init, jboolean normalizeGradients, jint printIter,
         jint saveIter) {
 
+    const char *styleImageNative = env->GetStringUTFChars(styleImage, 0);
+    const char *contentImageNative = env->GetStringUTFChars(contentImage, 0);
+    const char *outputImageNative = env->GetStringUTFChars(outputImage, 0);
+    const char *optimizerNative = env->GetStringUTFChars(optimizer, 0);
+    const char *modelFileNative = env->GetStringUTFChars(modelFile, 0);
+    const char *protoFileNative = env->GetStringUTFChars(protoFile, 0);
+    const char *backendNative = env->GetStringUTFChars(backend, 0);
+    const char *blendWeightsNative = env->GetStringUTFChars(styleBlendWeights, 0);
+    const char *styleLayersNative = env->GetStringUTFChars(styleLayers, 0);
+    const char *contentLayersNative = env->GetStringUTFChars(contentLayers, 0);
+    const char *poolingNative = env->GetStringUTFChars(pooling, 0);
+    const char *initNative = env->GetStringUTFChars(init, 0);
+
     lua_newtable(L);
-    lua_pushstring(L, styleImage);
+    lua_pushstring(L, styleImageNative);
     lua_setfield(L, -2, "style_image");
 
-    lua_pushstring(L, contentImage);
+    lua_pushstring(L, contentImageNative);
     lua_setfield(L, -2, "content_image");
 
-    lua_pushstring(L, outputImage);
+    lua_pushstring(L, outputImageNative);
     lua_setfield(L, -2, "output_image");
 
     lua_pushinteger(L, gpu);
@@ -68,31 +81,31 @@ Java_com_naman14_arcade_library_Arcade_stylize(
     lua_pushinteger(L, imageSize);
     lua_setfield(L, -2, "image_size");
 
-    lua_pushstring(L, optimizer);
+    lua_pushstring(L, optimizerNative);
     lua_setfield(L, -2, "optimizer");
 
-    lua_pushstring(L, modelFile);
+    lua_pushstring(L, modelFileNative);
     lua_setfield(L, -2, "model_file");
 
-    lua_pushstring(L, protoFile);
+    lua_pushstring(L, protoFileNative);
     lua_setfield(L, -2, "proto_file");
 
-    lua_pushstring(L, backend);
+    lua_pushstring(L, backendNative);
     lua_setfield(L, -2, "backend");
 
     luaT_pushlong(L, styleScale);
     lua_setfield(L, -2, "style_scale");
 
-    lua_pushstring(L, styleBlendWeights);
+    lua_pushstring(L, blendWeightsNative);
     lua_setfield(L, -2, "style_blend_weights");
 
-    lua_pushstring(L, styleLayers);
+    lua_pushstring(L, styleLayersNative);
     lua_setfield(L, -2, "style_layers");
 
-    lua_pushstring(L, contentLayers);
+    lua_pushstring(L, contentLayersNative);
     lua_setfield(L, -2, "content_layers");
 
-    lua_pushstring(L, pooling);
+    lua_pushstring(L, poolingNative);
     lua_setfield(L, -2, "pooling");
 
     luaT_pushlong(L, tvWeight);
@@ -110,7 +123,7 @@ Java_com_naman14_arcade_library_Arcade_stylize(
     lua_pushinteger(L, learningRate);
     lua_setfield(L, -2, "learning_rate");
 
-    lua_pushstring(L, init);
+    lua_pushstring(L, initNative);
     lua_setfield(L, -2, "init");
 
     lua_pushboolean(L, normalizeGradients);
@@ -126,6 +139,20 @@ Java_com_naman14_arcade_library_Arcade_stylize(
     lua_insert(L, -2);   // swap table and function into correct order for pcall
 
     int result = lua_pcall(L, 1, 0, 0);
+
+    env->ReleaseStringUTFChars(styleImage, styleImageNative);
+    env->ReleaseStringUTFChars(contentImage, contentImageNative);
+    env->ReleaseStringUTFChars(outputImage, outputImageNative);
+    env->ReleaseStringUTFChars(protoFile, protoFileNative);
+    env->ReleaseStringUTFChars(modelFile, modelFileNative);
+    env->ReleaseStringUTFChars(init, initNative);
+    env->ReleaseStringUTFChars(styleBlendWeights, blendWeightsNative);
+    env->ReleaseStringUTFChars(pooling, poolingNative);
+    env->ReleaseStringUTFChars(styleLayers, styleLayersNative);
+    env->ReleaseStringUTFChars(contentLayers, contentLayersNative);
+    env->ReleaseStringUTFChars(backend, backendNative);
+    env->ReleaseStringUTFChars(optimizer, optimizerNative);
+
 
 }
 
