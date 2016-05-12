@@ -8,11 +8,9 @@ require 'loadcaffe'
 --------------------------------------------------------------------------------
 function stylize(params)
 
-    print("Style image is ", params.style_image)
-    print("Content image is ", params.content_image)
-    print("Num of iterations are ", params.num_iterations)
-
     updateProgress(string.format("Style image is %s", params.style_image))
+    updateProgress(string.format("Content image is %s", params.content_image))
+    updateProgress(string.format("Number of iterations are %d", params.num_iterations))
 
     if params.gpu >= 0 then
         if params.backend ~= 'clnn' then
@@ -37,15 +35,14 @@ function stylize(params)
     end
 
 
-    print("Proto model is", params.model_file)
-    print("Proto file is", params.proto_file)
+    updateProgress(string.format("Proto model is %s", params.model_file))
+    updateProgress(string.format("Proto file is %s", params.proto_file))
 
     local loadcaffe_backend = params.backend
-    print("attempting to load model")
+    updateProgress("Attempting to load model")
     if params.backend == 'clnn' then loadcaffe_backend = 'nn' end
     local cnn = loadcaffe.load(params.proto_file, params.model_file, loadcaffe_backend):float()
-    print(#cnn.modules)
-    print("model loaded")
+    updateProgress("Model loaded")
     if params.gpu >= 0 then
         if params.backend ~= 'clnn' then
             cnn:cuda()
@@ -55,7 +52,6 @@ function stylize(params)
     end
 
     local content_image = image.load(params.content_image, 3)
-    print("image laoded")
     content_image = image.scale(content_image, params.image_size, 'bilinear')
     local content_image_caffe = preprocess(content_image):float()
 
@@ -115,7 +111,6 @@ function stylize(params)
     local content_losses, style_losses = {}, {}
     local next_content_idx, next_style_idx = 1, 1
     local net = nn.Sequential()
-    print(params.tv_weight)
     if params.tv_weight > 0 then
         local tv_mod = nn.TVLoss(params.tv_weight):float()
         if params.gpu >= 0 then
@@ -147,13 +142,13 @@ function stylize(params)
                     end
                 end
                 local msg = 'Replacing max pooling at layer %d with average pooling'
-                print(string.format(msg, i))
+                updateProgress(string.format(msg, i))
                 net:add(avg_pool_layer)
             else
                 net:add(layer)
             end
             if name == content_layers[next_content_idx] then
-                print("Setting up content layer", i, ":", layer.name)
+                updateProgress(string.format("Setting up content layer %d : %s", i, layer.name))
                 local target = net:forward(content_image_caffe):clone()
                 local norm = params.normalize_gradients
                 local loss_module = nn.ContentLoss(params.content_weight, target, norm):float()
@@ -169,7 +164,7 @@ function stylize(params)
                 next_content_idx = next_content_idx + 1
             end
             if name == style_layers[next_style_idx] then
-                print("Setting up style layer  ", i, ":", layer.name)
+                updateProgress(string.format("Setting up style layer %d : %s", i, layer.name))
                 local gram = GramMatrix():float()
                 if params.gpu >= 0 then
                     if params.backend ~= 'clnn' then
@@ -179,7 +174,6 @@ function stylize(params)
                     end
                 end
                 local target = nil
-                print(#style_images_caffe)
                 for i = 1, #style_images_caffe do
                     local target_features = net:forward(style_images_caffe[i]):clone()
                     local target_i = gram:forward(target_features):clone()
@@ -258,19 +252,20 @@ function stylize(params)
         }
     else
         error(string.format('Unrecognized optimizer "%s"', params.optimizer))
+        updateProgress(string.format('Unrecognized optimizer "%s"', params.optimizer))
     end
 
     local function maybe_print(t, loss)
         local verbose = (params.print_iter > 0 and t % params.print_iter == 0)
         if verbose then
-            print(string.format('Iteration %d / %d', t, params.num_iterations))
+            updateProgress(string.format('Iteration %d / %d', t, params.num_iterations))
             for i, loss_module in ipairs(content_losses) do
-                print(string.format('  Content %d loss: %f', i, loss_module.loss))
+                updateProgress(string.format('  Content %d loss: %f', i, loss_module.loss))
             end
             for i, loss_module in ipairs(style_losses) do
-                print(string.format('  Style %d loss: %f', i, loss_module.loss))
+                updateProgress(string.format('  Style %d loss: %f', i, loss_module.loss))
             end
-            print(string.format('  Total loss: %f', loss))
+            updateProgress(string.format('  Total loss: %f', loss))
         end
     end
 
@@ -284,7 +279,7 @@ function stylize(params)
             if t == params.num_iterations then
                 filename = params.output_image
             end
-            print("Saving image")
+            updateProgress("Saving image")
             image.save(filename, disp)
         end
     end
@@ -315,16 +310,17 @@ function stylize(params)
 
     -- Run optimization.
     if params.optimizer == 'lbfgs' then
-        print('Running optimization with L-BFGS')
+        updateProgress('Running optimization with L-BFGS')
         local x, losses = optim.lbfgs(feval, img, optim_state)
-        print("Done")
+        updateProgress("Done")
     elseif params.optimizer == 'adam' then
-        print('Running optimization with ADAM')
+        updateProgress('Running optimization with ADAM')
         for t = 1, params.num_iterations do
-            print(string.format("Doing Iteration %i of %s ...", t, params.num_iterations))
+            updateProgress(string.format("Doing Iteration %i of %s ...", t, params.num_iterations))
+--            updateIteration(t, params.num_iterations)
             local x, losses = optim.adam(feval, img, optim_state)
         end
-        print("Done")
+        updateProgress("Done")
     end
 end
 

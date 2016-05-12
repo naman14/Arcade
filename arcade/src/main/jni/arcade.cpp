@@ -9,6 +9,7 @@ extern "C" {
 lua_State *L;
 JNIEnv *globalEnv;
 
+//called from lua
 static void onProgressUpdate(lua_State *L) {
 
     int n = lua_gettop(L);
@@ -16,15 +17,31 @@ static void onProgressUpdate(lua_State *L) {
 
     size_t len;
     const char *log = lua_tolstring(L, 1, &len);
-    int currentIteration = lua_tonumber(L, 2);
-    int totalIterations = lua_tonumber(L, 3);
 
     jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
     jmethodID onProgressUpdate = globalEnv->GetStaticMethodID(clazz, "onProgressUpdate",
-                                                        "(Ljava/lang/String;)V");
+                                                              "(Ljava/lang/String;)V");
 
     jstring logString = globalEnv->NewStringUTF(log);
     globalEnv->CallStaticVoidMethod(clazz, onProgressUpdate, logString);
+
+}
+
+//called from lua
+static void onIterationUpdate(lua_State *L) {
+
+    D("ockfsincfs");
+    int n = lua_gettop(L);
+    int i;
+
+    int currentIteration = lua_tonumber(L, 1);
+    int totalIterations = lua_tonumber(L, 2);
+
+    jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
+    jmethodID onIterationUpdate = globalEnv->GetStaticMethodID(clazz, "onIterationUpdate",
+                                                               "(II)V");
+
+    globalEnv->CallStaticVoidMethod(clazz, onIterationUpdate, currentIteration, totalIterations);
 
 }
 
@@ -46,6 +63,8 @@ Java_com_naman14_arcade_library_Arcade_initialize(JNIEnv *env,
 
     L = inittorch(manager, nativeLibraryDir); // create a lua_State
     assert(NULL != manager);
+
+    globalEnv = env;
 
     // load file
     int ret;
@@ -187,7 +206,13 @@ Java_com_naman14_arcade_library_Arcade_setProgressListener(JNIEnv *env) {
     lua_CFunction function = (lua_CFunction) onProgressUpdate;
     lua_pushcfunction(L, function);
     lua_setglobal(L, "updateProgress");
-    globalEnv = env;
+}
+
+JNIEXPORT void JNICALL
+Java_com_naman14_arcade_library_Arcade_setIterationListener(JNIEnv *env) {
+    lua_CFunction function = (lua_CFunction) onIterationUpdate;
+    lua_pushcfunction(L, function);
+    lua_setglobal(L, "updateIteration");
 }
 
 

@@ -10,7 +10,8 @@ import android.view.MenuItem;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
-import com.naman14.arcade.library.ProgressListener;
+import com.naman14.arcade.library.listeners.IterationListener;
+import com.naman14.arcade.library.listeners.ProgressListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,10 +36,17 @@ public class MainActivity extends AppCompatActivity {
                 ArcadeBuilder builder = new ArcadeBuilder(MainActivity.this);
                 Arcade arcade = builder.build();
                 arcade.initialize();
+                arcade.setLogEnabled(true);
                 arcade.setProgressListener(new ProgressListener() {
                     @Override
                     public void onUpdateProgress(String log, int currentIteration, int totalIterations) {
-                        Log.d("progress - ", log);
+
+                    }
+                });
+                arcade.setIterationListener(new IterationListener() {
+                    @Override
+                    public void onIteration(int currentIteration, int totalIteration) {
+                        Log.d("iterations", String.valueOf(currentIteration) + " of " + String.valueOf(totalIteration));
                     }
                 });
                 arcade.stylize();

@@ -1,11 +1,12 @@
 package com.naman14.arcade.library;
 
-import android.os.AsyncTask;
-import android.provider.Settings;
 import android.util.Log;
 import android.content.res.AssetManager;
 import android.content.pm.ApplicationInfo;
 import android.content.Context;
+
+import com.naman14.arcade.library.listeners.IterationListener;
+import com.naman14.arcade.library.listeners.ProgressListener;
 
 public class Arcade {
 
@@ -13,7 +14,10 @@ public class Arcade {
     ApplicationInfo info;
     ArcadeBuilder builder;
 
+    static boolean logEnabled = true;
+
     static ProgressListener progressListener;
+    static IterationListener iterationListener;
 
     static {
         System.loadLibrary("png16");
@@ -47,10 +51,28 @@ public class Arcade {
         this.progressListener = progressListener;
     }
 
+    public void setIterationListener(IterationListener iterationListener) {
+        setProgressListener();
+        this.iterationListener = iterationListener;
+    }
+
+    public void setLogEnabled(boolean enabled) {
+        this.logEnabled = enabled;
+    }
+
     //Called from C
     public static void onProgressUpdate(String log) {
+        if (logEnabled) {
+            Log.d("Arcade ", log);
+        }
         if (progressListener != null) {
             progressListener.onUpdateProgress(log, -1, -1);
+        }
+    }
+    //Called from C
+    public static void onIterationUpdate(int current, int total) {
+        if (iterationListener != null) {
+            iterationListener.onIteration(current, total);
         }
     }
 
@@ -67,5 +89,7 @@ public class Arcade {
     private native String destroy();
 
     private native void setProgressListener();
+
+    private native void setIterationListener();
 
 }
