@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +24,9 @@ import com.naman14.arcade.library.ArcadeBuilder;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +34,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
     Button style, content, start;
+    RecyclerView styleRecyclerView;
 
     private static final int PICK_STYLE_IMAGE = 777;
     private static final int PICK_CONTENT_IMAGE = 888;
@@ -46,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
         content = (Button) findViewById(R.id.pickContent);
         start = (Button) findViewById(R.id.start);
 
+        styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
+        styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        setStylesData();
 
         style.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,5 +178,15 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void setStylesData() {
+        try {
+            JSONArray array = new JSONArray(Utils.loadAssetTextAsString(this, "styleimages.json"));
+            StylesAdapter adapter = new StylesAdapter(this, array);
+            styleRecyclerView.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

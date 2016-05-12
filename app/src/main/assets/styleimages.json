@@ -1,9 +1,5 @@
 [
   {
-    "title": "Escher Sphere",
-    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/escher_sphere.jpg"
-  },
-  {
     "title": "Frida Kahlo",
     "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/frida_kahlo.jpg"
   },
