@@ -1,6 +1,6 @@
 package com.naman14.arcade;
 
-import android.content.Context;
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.File;
+
 
 /**
  * Created by naman on 12/05/16.
@@ -21,9 +23,9 @@ import org.json.JSONException;
 public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder> {
 
     JSONArray array;
-    private Context context;
+    private Activity context;
 
-    public StylesAdapter(Context context, JSONArray array) {
+    public StylesAdapter(Activity context, JSONArray array) {
         this.array = array;
         this.context = context;
     }
@@ -71,6 +73,18 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
             styleImage = (ImageView) itemLayoutView.findViewById(R.id.style_image);
             styleName = (TextView) itemLayoutView.findViewById(R.id.style_name);
             foreground = itemLayoutView.findViewById(R.id.foreground);
+
+            itemLayoutView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        File file = ImageLoader.getInstance().getDiskCache().get(array.getJSONObject(getAdapterPosition()).getString("url"));
+                        ((MainActivity) context).onStyleImageChoosen(file.getAbsolutePath());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 

@@ -17,7 +17,7 @@
         android:id="@+id/foregroundView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#33000000" />
+        android:background="#44000000" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -32,55 +32,60 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/styles_recyclerview"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="30dp"
         android:gravity="center_horizontal|bottom"
         android:orientation="vertical"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <Button
             android:id="@+id/start"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFC107"
-            android:text="Start"
-            android:textColor="@android:color/black"
-            android:textSize="10sp" />
+            android:background="@drawable/border_textview"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Begin styling"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
-        <Button
-            android:id="@+id/pickContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:background="#FFC107"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="Choose a content image"
-            android:textColor="@android:color/black"
-            android:textSize="13sp" />
 
         <Button
             android:id="@+id/pickStyle"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:background="#FFC107"
+            android:background="@drawable/border_textview"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="Pick a style image"
-            android:textColor="@android:color/black"
-            android:textSize="10sp"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/pickStyleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Or choose from one of the below"
+            android:text="Or choose from one of the below artworks"
             android:textColor="@android:color/white"
             android:visibility="gone" />
+
+        <Button
+            android:id="@+id/pickContent"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/border_textview"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="Choose a content image"
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
 
 
     </LinearLayout>
@@ -96,5 +101,46 @@
         android:paddingBottom="5dp"
         android:visibility="invisible" />
 
+    <FrameLayout
+        android:id="@+id/log_container"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/status_bar_margin" />
 
+    <LinearLayout
+        android:id="@+id/logoView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="55dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="arcade"
+            android:textColor="@android:color/white"
+            android:textSize="70sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:text="artworks at your hand"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/styleImagePreview"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 </RelativeLayout>

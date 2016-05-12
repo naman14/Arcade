@@ -48,7 +48,7 @@ public class LogFragment extends Fragment {
 
         @Override
         public ItemHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_log_item, null);
+            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_log_item, viewGroup, false);
             return new ItemHolder(v);
         }
 

@@ -1,10 +1,12 @@
 package com.naman14.arcade;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,14 +21,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,13 +45,21 @@ public class MainActivity extends AppCompatActivity {
 
     Button style, content, start;
     RecyclerView styleRecyclerView;
-    ImageView stylizedImage;
-    View foregroundView;
+    ImageView stylizedImage, styleImagePreview;
+    View foregroundView, logoView;
+    TextView styleButtonText;
 
     private static final int PICK_STYLE_IMAGE = 777;
     private static final int PICK_CONTENT_IMAGE = 888;
 
     private ArcadeBuilder builder;
+    private LogFragment logFragment;
+
+    private int currentState = 1;
+    private static final int STATE_CONTENT_CHOOSE = 1;
+    private static final int STATE_STYLE_CHOOSE = 2;
+    private static final int STATE_BEGIN_STYLING = 3;
+    private static final int STATE_STYLING = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
         content = (Button) findViewById(R.id.pickContent);
         start = (Button) findViewById(R.id.start);
         stylizedImage = (ImageView) findViewById(R.id.stylizedImage);
+        styleImagePreview = (ImageView) findViewById(R.id.styleImagePreview);
         foregroundView = findViewById(R.id.foregroundView);
+        logoView = findViewById(R.id.logoView);
+        styleButtonText = (TextView) findViewById(R.id.pickStyleText);
 
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -86,29 +103,11 @@ public class MainActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        Arcade arcade = builder.build();
-                        arcade.initialize();
-                        arcade.setLogEnabled(true);
-                        arcade.setProgressListener(new ProgressListener() {
-                            @Override
-                            public void onUpdateProgress(String log, int currentIteration, int totalIterations) {
-
-                            }
-                        });
-                        arcade.setIterationListener(new IterationListener() {
-                            @Override
-                            public void onIteration(int currentIteration, int totalIteration) {
-                                Log.d("iterations", String.valueOf(currentIteration) + " of " + String.valueOf(totalIteration));
-                            }
-                        });
-                        arcade.stylize();
-                        return null;
-                    }
-                }.execute();
-
+                currentState = STATE_STYLING;
+                animateViewVisiblity(styleImagePreview, false);
+                animateViewVisiblity(start, false);
+                animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#11000000"));
+//                beginStyling();
             }
         });
 
@@ -131,6 +130,67 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void beginStyling() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Arcade arcade = builder.build();
+                arcade.initialize();
+                arcade.setLogEnabled(true);
+                setupLogFragment();
+                arcade.setProgressListener(new ProgressListener() {
+                    @Override
+                    public void onUpdateProgress(final String log, int currentIteration, int totalIterations) {
+                        if (logFragment != null)
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    logFragment.addLog(log);
+                                }
+                            });
+                    }
+                });
+                arcade.setIterationListener(new IterationListener() {
+                    @Override
+                    public void onIteration(int currentIteration, int totalIteration) {
+                        Log.d("iterations", String.valueOf(currentIteration) + " of " + String.valueOf(totalIteration));
+                    }
+                });
+                arcade.stylize();
+                return null;
+            }
+        }.execute();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        switch (currentState) {
+            case STATE_CONTENT_CHOOSE:
+                super.onBackPressed();
+                break;
+            case STATE_STYLE_CHOOSE:
+                currentState = STATE_CONTENT_CHOOSE;
+                content.setVisibility(View.VISIBLE);
+                showLogoView();
+                hideStyleImages();
+                moveStyleButton(false);
+                animateViewVisiblity(content, true);
+                break;
+            case STATE_BEGIN_STYLING:
+                currentState = STATE_STYLE_CHOOSE;
+                animateViewVisiblity(styleImagePreview, false);
+                animateViewVisiblity(start, false);
+                animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#44000000"));
+                showStyleImages();
+                moveStyleButton(true);
+                break;
+            case STATE_STYLING:
+                break;
+        }
+
     }
 
     @Override
@@ -177,22 +237,39 @@ public class MainActivity extends AppCompatActivity {
 
 
             cursor.close();
-
+            Handler handler = new Handler();
+            DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(300)).build();
             switch (requestCode) {
                 case PICK_STYLE_IMAGE:
+                    currentState = STATE_BEGIN_STYLING;
                     builder.setStyleimage(filePath);
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), styleImagePreview, options);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideStyleImages();
+                            moveStyleButton(false);
+                            animateViewVisiblity(start, true);
+                            animateStylePreview();
+                        }
+                    }, 400);
+
                     break;
                 case PICK_CONTENT_IMAGE:
                     builder.setContentImage(filePath);
-                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), stylizedImage);
-                    Handler handler = new Handler();
+                    content.setVisibility(View.GONE);
+                    currentState = STATE_STYLE_CHOOSE;
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), stylizedImage, options);
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             setStylesData();
                             showStyleImages();
+                            hideLogoView();
+                            animateViewVisiblity(style, true);
+                            moveStyleButton(true);
                         }
-                    }, 500);
+                    }, 400);
 
                     break;
 
@@ -200,6 +277,16 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    public void onStyleImageChoosen(String filePath) {
+        currentState = STATE_BEGIN_STYLING;
+        builder.setStyleimage(filePath);
+        hideStyleImages();
+        moveStyleButton(false);
+        animateViewVisiblity(start, true);
+        ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), styleImagePreview);
+        animateStylePreview();
     }
 
     private void setStylesData() {
@@ -212,10 +299,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void fadeoutForeground() {
-        ObjectAnimator animator = ObjectAnimator.ofFloat(foregroundView, "alpha", 1f, 0f);
-        animator.setDuration(200);
-        animator.start();
+    private void setupLogFragment() {
+        logFragment = new LogFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.log_container, logFragment).commit();
     }
 
     private void showStyleImages() {
@@ -236,4 +322,64 @@ public class MainActivity extends AppCompatActivity {
                 .translationY(styleRecyclerView.getHeight())
                 .alpha(0.0f);
     }
+
+    private void hideLogoView() {
+        logoView.setVisibility(View.VISIBLE);
+        logoView.setAlpha(1.0f);
+        logoView.animate()
+                .setDuration(400)
+                .translationY(-logoView.getHeight())
+                .alpha(0.0f);
+    }
+
+    private void showLogoView() {
+        logoView.setVisibility(View.VISIBLE);
+        logoView.setTranslationY(-logoView.getHeight());
+        logoView.setAlpha(0.0f);
+        logoView.animate()
+                .setDuration(400)
+                .translationY(0)
+                .alpha(1.0f);
+    }
+
+    private void moveStyleButton(boolean up) {
+        style.setVisibility(View.VISIBLE);
+        ViewPropertyAnimator animator = style.animate().setDuration(400);
+        if (up)
+            animator.translationY(-styleRecyclerView.getHeight());
+        else animator.translationY(styleRecyclerView.getHeight());
+        styleButtonText.setVisibility(View.VISIBLE);
+        ViewPropertyAnimator animator2 = styleButtonText.animate().setDuration(400);
+        if (up)
+            animator2.translationY(-styleRecyclerView.getHeight());
+        else animator2.translationY(styleRecyclerView.getHeight());
+    }
+
+    private void animateViewVisiblity(View view, boolean visible) {
+        if (visible) {
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(0.0f);
+            view.animate()
+                    .setDuration(400)
+                    .alpha(1.0f);
+        } else {
+            view.setAlpha(1.0f);
+            view.animate()
+                    .setDuration(400)
+                    .alpha(0.0f);
+        }
+    }
+
+    private void animateStylePreview() {
+        animateForegroundView(Color.parseColor("#44000000"), Color.parseColor("#88000000"));
+        animateViewVisiblity(styleImagePreview, true);
+    }
+
+    private void animateForegroundView(int startColor, int endColor) {
+        ObjectAnimator animator = ObjectAnimator.ofInt(foregroundView, "backgroundColor", startColor,
+                endColor).setDuration(500);
+        animator.setEvaluator(new ArgbEvaluator());
+        animator.start();
+    }
+
 }
