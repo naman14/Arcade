@@ -21,6 +21,25 @@
         android:layout_height="wrap_content"
         android:text="Hello World!" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pickStyle"
+        android:text="STyle image"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pickContent"
+        android:text="Content image"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/start"
+        android:text="Start"/>
+
+
 </LinearLayout>
 
 
