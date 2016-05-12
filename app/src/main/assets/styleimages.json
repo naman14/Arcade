@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Escher Sphere",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/escher_sphere.jpg"
+  },
+  {
+    "title": "Frida Kahlo",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/frida_kahlo.jpg"
+  },
+  {
+    "title": "Golden Gate",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/golden_gate.jpg"
+  },
+  {
+    "title": "Pablo Picasso Self Portrait",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/picasso_selfport1907.jpg"
+  },
+  {
+    "title": "Seated Nude",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/seated-nude.jpg"
+  },
+  {
+    "title": "Ship Wreck of Minatour",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/shipwreck.jpg"
+  },
+  {
+    "title": "Starry Night",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/starry_night_crop.png"
+  },
+  {
+    "title": "The scream",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/the_scream.jpg"
+  },
+  {
+    "title": "Woman with hat",
+    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/woman-with-hat-matisse.jpg"
+  }
+]
