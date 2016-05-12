@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.json.JSONArray;
@@ -45,9 +46,12 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
         try {
             viewHolder.foreground.setVisibility(View.VISIBLE);
             viewHolder.styleImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+                    .cacheInMemory(true).cacheOnDisk(true)
+                    .build();
             viewHolder.styleName.setText(array.getJSONObject(position).getString("title"));
             ImageLoader.getInstance().displayImage(array.getJSONObject(position).getString("url"),
-                    viewHolder.styleImage);
+                    viewHolder.styleImage, defaultOptions);
 
         } catch (JSONException e) {
             e.printStackTrace();

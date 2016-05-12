@@ -1,5 +1,6 @@
 package com.naman14.arcade;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,11 +20,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     Button style, content, start;
     RecyclerView styleRecyclerView;
+    ImageView stylizedImage;
+    View foregroundView;
 
     private static final int PICK_STYLE_IMAGE = 777;
     private static final int PICK_CONTENT_IMAGE = 888;
@@ -47,14 +53,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setTitle("");
 
         style = (Button) findViewById(R.id.pickStyle);
         content = (Button) findViewById(R.id.pickContent);
         start = (Button) findViewById(R.id.start);
+        stylizedImage = (ImageView) findViewById(R.id.stylizedImage);
+        foregroundView = findViewById(R.id.foregroundView);
 
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        setStylesData();
 
         style.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,10 +154,13 @@ public class MainActivity extends AppCompatActivity {
                 File folder = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp");
                 if (!folder.exists())
                     folder.mkdirs();
-                File convertedImage = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp/convertedinput.png");
-                if (convertedImage.exists()) {
-                    convertedImage = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp/convertedinput2.png");
-                }
+
+                File convertedImage;
+                if (requestCode == PICK_STYLE_IMAGE)
+                    convertedImage = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp/convertedstyleinput.png");
+                else
+                    convertedImage = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp/convertedcontentinput.png");
+
 
                 //TODO delete the temp folder when finished
 
@@ -172,6 +184,16 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case PICK_CONTENT_IMAGE:
                     builder.setContentImage(filePath);
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), stylizedImage);
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            setStylesData();
+                            showStyleImages();
+                        }
+                    }, 500);
+
                     break;
 
             }
@@ -188,5 +210,30 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void fadeoutForeground() {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(foregroundView, "alpha", 1f, 0f);
+        animator.setDuration(200);
+        animator.start();
+    }
+
+    private void showStyleImages() {
+        styleRecyclerView.setVisibility(View.VISIBLE);
+        styleRecyclerView.setTranslationY(styleRecyclerView.getHeight());
+        styleRecyclerView.setAlpha(0.0f);
+        styleRecyclerView.animate()
+                .setDuration(400)
+                .translationY(0)
+                .alpha(1.0f);
+    }
+
+    private void hideStyleImages() {
+        styleRecyclerView.setVisibility(View.VISIBLE);
+        styleRecyclerView.setAlpha(1.0f);
+        styleRecyclerView.animate()
+                .setDuration(400)
+                .translationY(styleRecyclerView.getHeight())
+                .alpha(0.0f);
     }
 }

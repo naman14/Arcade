@@ -4,57 +4,97 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/background">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ImageView
+        android:id="@+id/stylizedImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <View
+        android:id="@+id/foregroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/status_bar_margin"
+        android:background="@android:color/transparent"
+        android:theme="@style/Theme.AppCompat"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/styles_recyclerview"
+        android:layout_marginBottom="15dp"
+        android:gravity="center_horizontal|bottom"
         android:orientation="vertical"
         android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!" />
-
-        <Button
-            android:id="@+id/pickStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="STyle image" />
-
-        <Button
-            android:id="@+id/pickContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Content image" />
 
         <Button
             android:id="@+id/start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start" />
+            android:background="#FFC107"
+            android:text="Start"
+            android:textColor="@android:color/black"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/pickContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="#FFC107"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="Choose a content image"
+            android:textColor="@android:color/black"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/pickStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="#FFC107"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Pick a style image"
+            android:textColor="@android:color/black"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/pickStyleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Or choose from one of the below"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
 
 
     </LinearLayout>
 
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/styles_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="160dp"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:clipToPadding="false"
-        android:paddingBottom="10dp" />
+        android:paddingBottom="5dp"
+        android:visibility="invisible" />
 
 
 </RelativeLayout>
