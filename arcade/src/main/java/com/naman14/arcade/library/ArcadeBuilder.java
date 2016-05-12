@@ -40,11 +40,11 @@ public class ArcadeBuilder {
         this.gpu = -1;
         this.styleimage = "/sdcard/examples/inputs/starry_night_crop.png";
         this.contentImage = "/sdcard/examples/outputs/golden_gate_scream.png";
-        this.outputImage = "/storage/emulated/0/Arcade/outputs/output.png";
-        this.iterations = 5;
+        this.outputImage = "/storage/emulated/0/Arcade/output.png";
+        this.iterations = 40;
         this.backend = "nn";
         this.optimizer = "adam";
-        this.imageSize = 256;
+        this.imageSize = 128;
         this.contentLayers = "relu0,relu3,relu7,relu12";
         this.styleLayers = "relu0,relu3,relu7,relu12";
         this.protoFIle = "/storage/emulated/0/models/train_val.prototxt";
@@ -58,7 +58,8 @@ public class ArcadeBuilder {
         this.tvWeight = (long) 0.01;
         this.seed = 123;
         this.learningRate = 10;
-        this.init = "random";
+        this.init = "image";
+        this.styleBlendWeights = "nil";
         this.normalizeGradients = false;
 
     }

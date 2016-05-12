@@ -4,11 +4,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
+import com.naman14.arcade.library.ProgressListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,8 +23,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        torch = new Torch(this);
-//        torch.call("neural_style.lua");
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -35,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
                 ArcadeBuilder builder = new ArcadeBuilder(MainActivity.this);
                 Arcade arcade = builder.build();
                 arcade.initialize();
+                arcade.setProgressListener(new ProgressListener() {
+                    @Override
+                    public void onUpdateProgress(String log, int currentIteration, int totalIterations) {
+                        Log.d("progress - ", log);
+                    }
+                });
                 arcade.stylize();
                 return null;
             }

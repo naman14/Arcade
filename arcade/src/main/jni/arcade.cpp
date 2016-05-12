@@ -7,6 +7,26 @@
 extern "C" {
 
 lua_State *L;
+JNIEnv *globalEnv;
+
+static void onProgressUpdate(lua_State *L) {
+
+    int n = lua_gettop(L);
+    int i;
+
+    size_t len;
+    const char *log = lua_tolstring(L, 1, &len);
+    int currentIteration = lua_tonumber(L, 2);
+    int totalIterations = lua_tonumber(L, 3);
+
+    jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
+    jmethodID onProgressUpdate = globalEnv->GetStaticMethodID(clazz, "onProgressUpdate",
+                                                        "(Ljava/lang/String;)V");
+
+    jstring logString = globalEnv->NewStringUTF(log);
+    globalEnv->CallStaticVoidMethod(clazz, onProgressUpdate, logString);
+
+}
 
 JNIEXPORT jstring JNICALL
 Java_com_naman14_arcade_library_Arcade_initialize(JNIEnv *env,
@@ -161,6 +181,15 @@ Java_com_naman14_arcade_library_Arcade_destroy(JNIEnv *env, jobject thiz) {
     // destroy the Lua State
     lua_close(L);
 }
+
+JNIEXPORT void JNICALL
+Java_com_naman14_arcade_library_Arcade_setProgressListener(JNIEnv *env) {
+    lua_CFunction function = (lua_CFunction) onProgressUpdate;
+    lua_pushcfunction(L, function);
+    lua_setglobal(L, "updateProgress");
+    globalEnv = env;
+}
+
 
 }
 

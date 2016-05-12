@@ -13,6 +13,8 @@ public class Arcade {
     ApplicationInfo info;
     ArcadeBuilder builder;
 
+    static ProgressListener progressListener;
+
     static {
         System.loadLibrary("png16");
         System.loadLibrary("arcade");
@@ -40,6 +42,18 @@ public class Arcade {
         destroy();
     }
 
+    public void setProgressListener(ProgressListener progressListener) {
+        setProgressListener();
+        this.progressListener = progressListener;
+    }
+
+    //Called from C
+    public static void onProgressUpdate(String log) {
+        if (progressListener != null) {
+            progressListener.onUpdateProgress(log, -1, -1);
+        }
+    }
+
     // native method
     private native String initialize(AssetManager manager, String path, String luafile);
 
@@ -51,5 +65,7 @@ public class Arcade {
                                   int printIterations, int saveIterations);
 
     private native String destroy();
+
+    private native void setProgressListener();
 
 }
