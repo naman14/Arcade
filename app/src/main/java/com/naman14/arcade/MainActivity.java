@@ -25,6 +25,7 @@ import android.view.ViewPropertyAnimator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
@@ -33,6 +34,7 @@ import com.naman14.arcade.library.listeners.ProgressListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 animateViewVisiblity(styleImagePreview, false);
                 animateViewVisiblity(start, false);
                 animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#11000000"));
-//                beginStyling();
+                beginStyling();
             }
         });
 
@@ -279,14 +281,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onStyleImageChoosen(String filePath) {
+    public void onStyleImageChoosen(final String filePath, final String name) {
         currentState = STATE_BEGIN_STYLING;
-        builder.setStyleimage(filePath);
-        hideStyleImages();
-        moveStyleButton(false);
-        animateViewVisiblity(start, true);
-        ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), styleImagePreview);
-        animateStylePreview();
+        ImageLoader.getInstance().loadImage(Uri.fromFile(new File(filePath)).toString(), new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                SaveToDevice save = new SaveToDevice(loadedImage, name);
+                save.execute();
+            }
+        });
+
     }
 
     private void setStylesData() {
@@ -380,6 +384,56 @@ public class MainActivity extends AppCompatActivity {
                 endColor).setDuration(500);
         animator.setEvaluator(new ArgbEvaluator());
         animator.start();
+    }
+
+    private class SaveToDevice extends AsyncTask<Void, Void, String> {
+
+        Bitmap bitmap;
+        String name;
+
+        public SaveToDevice(Bitmap bitmap, String name) {
+            this.bitmap = bitmap;
+            this.name = name;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String root = Environment.getExternalStorageDirectory().toString();
+            File myDir = new File(root + "/Arcade/Inputs");
+
+            if (!myDir.exists())
+                myDir.mkdirs();
+
+            File file = new File(myDir.getAbsolutePath(), name.replaceAll("\\s+","") + ".png");
+            if (file.exists()) file.delete();
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            return file.getAbsolutePath();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                builder.setStyleimage(result);
+                hideStyleImages();
+                moveStyleButton(false);
+                animateViewVisiblity(start, true);
+                ImageLoader.getInstance().displayImage(Uri.fromFile(new File(result)).toString(), styleImagePreview);
+                animateStylePreview();
+            } else Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
     }
 
 }

@@ -28,9 +28,27 @@ static void onProgressUpdate(lua_State *L) {
 }
 
 //called from lua
+static void onImageSaved(lua_State *L) {
+
+    int n = lua_gettop(L);
+    int i;
+
+    size_t len;
+    const char *path = lua_tolstring(L, 1, &len);
+    bool isFinal = lua_toboolean(L, 2);
+
+    jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
+    jmethodID onImageSaved = globalEnv->GetStaticMethodID(clazz, "onImageSaved",
+                                                          "(Ljava/lang/String;Z)V");
+
+    jstring pathString = globalEnv->NewStringUTF(path);
+    globalEnv->CallStaticVoidMethod(clazz, onImageSaved, pathString, isFinal);
+
+}
+
+//called from lua
 static void onIterationUpdate(lua_State *L) {
 
-    D("ockfsincfs");
     int n = lua_gettop(L);
     int i;
 
@@ -213,6 +231,13 @@ Java_com_naman14_arcade_library_Arcade_setIterationListener(JNIEnv *env) {
     lua_CFunction function = (lua_CFunction) onIterationUpdate;
     lua_pushcfunction(L, function);
     lua_setglobal(L, "updateIteration");
+}
+
+JNIEXPORT void JNICALL
+Java_com_naman14_arcade_library_Arcade_setImageSavedListener(JNIEnv *env) {
+    lua_CFunction function = (lua_CFunction) onImageSaved;
+    lua_pushcfunction(L, function);
+    lua_setglobal(L, "onImageSaved");
 }
 
 

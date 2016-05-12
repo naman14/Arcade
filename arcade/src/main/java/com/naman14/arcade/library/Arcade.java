@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.content.pm.ApplicationInfo;
 import android.content.Context;
 
+import com.naman14.arcade.library.listeners.ImageSavedListener;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
 
@@ -18,6 +19,7 @@ public class Arcade {
 
     static ProgressListener progressListener;
     static IterationListener iterationListener;
+    static ImageSavedListener imageSavedListener;
 
     static {
         System.loadLibrary("png16");
@@ -56,6 +58,11 @@ public class Arcade {
         this.iterationListener = iterationListener;
     }
 
+    public void setImageSavedListener(ImageSavedListener listener) {
+        setImageSavedListener();
+        this.imageSavedListener = listener;
+    }
+
     public void setLogEnabled(boolean enabled) {
         this.logEnabled = enabled;
     }
@@ -69,10 +76,18 @@ public class Arcade {
             progressListener.onUpdateProgress(log, -1, -1);
         }
     }
+
     //Called from C
     public static void onIterationUpdate(int current, int total) {
         if (iterationListener != null) {
             iterationListener.onIteration(current, total);
+        }
+    }
+
+    //Called from C
+    public static void onImageSaved(String path, boolean isFinal) {
+        if (imageSavedListener != null) {
+            imageSavedListener.onImageSaved(path, isFinal);
         }
     }
 
@@ -91,5 +106,7 @@ public class Arcade {
     private native void setProgressListener();
 
     private native void setIterationListener();
+
+    private native void setImageSavedListener();
 
 }

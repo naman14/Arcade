@@ -79,7 +79,8 @@ public class StylesAdapter extends RecyclerView.Adapter<StylesAdapter.ViewHolder
                 public void onClick(View v) {
                     try {
                         File file = ImageLoader.getInstance().getDiskCache().get(array.getJSONObject(getAdapterPosition()).getString("url"));
-                        ((MainActivity) context).onStyleImageChoosen(file.getAbsolutePath());
+                        ((MainActivity) context).onStyleImageChoosen(file.getAbsolutePath(),
+                                array.getJSONObject(getAdapterPosition()).getString("title"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
