@@ -49,12 +49,12 @@ public class ArcadeBuilder {
         this.styleLayers = "relu0,relu3,relu7,relu12";
         this.protoFIle = "/storage/emulated/0/models/train_val.prototxt";
         this.modelFile = "/storage/emulated/0/models/nin_imagenet_conv.caffemodel";
-        this.contentWeight = 100;
-        this.styleWeight = 100;
+        this.contentWeight = 20;
+        this.styleWeight = 200;
         this.printIterations = 1;
         this.saveIterations = 1;
         this.styleScale = 1L;
-        this.pooling = "avg";
+        this.pooling = "max";
         this.tvWeight = (long) 0.01;
         this.seed = 123;
         this.learningRate = 10;

@@ -3,6 +3,7 @@ package com.naman14.arcade;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -114,6 +116,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         builder = new ArcadeBuilder(MainActivity.this);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        builder.setImageSize(preferences.getInt("preference_image_size", 128));
+        builder.setIterations(preferences.getInt("preference_iterations", 15));
+        builder.setContentWeight(preferences.getInt("preference_content_weight", 20));
+        builder.setStyleWeight(preferences.getInt("preference_style_weight", 200));
 
 
     }
@@ -127,8 +134,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.action_settings:
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -174,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onBackPressed();
                 break;
             case STATE_STYLE_CHOOSE:
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 currentState = STATE_CONTENT_CHOOSE;
                 content.setVisibility(View.VISIBLE);
                 showLogoView();
@@ -244,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
                 case PICK_STYLE_IMAGE:
                     currentState = STATE_BEGIN_STYLING;
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     builder.setStyleimage(filePath);
                     ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), styleImagePreview, options);
                     handler.postDelayed(new Runnable() {
@@ -260,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 case PICK_CONTENT_IMAGE:
                     builder.setContentImage(filePath);
                     content.setVisibility(View.GONE);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     currentState = STATE_STYLE_CHOOSE;
                     ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), stylizedImage, options);
                     handler.postDelayed(new Runnable() {
@@ -404,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
             if (!myDir.exists())
                 myDir.mkdirs();
 
-            File file = new File(myDir.getAbsolutePath(), name.replaceAll("\\s+","") + ".png");
+            File file = new File(myDir.getAbsolutePath(), name.replaceAll("\\s+", "") + ".png");
             if (file.exists()) file.delete();
             try {
                 FileOutputStream out = new FileOutputStream(file);

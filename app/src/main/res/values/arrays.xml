@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_image_size_entries">
+        <item>128</item>
+        <item>256</item>
+        <item>512</item>
+    </string-array>
+
+    <string-array name="pref_image_size_values">
+        <item>128</item>
+        <item>256</item>
+        <item>512</item>
+    </string-array>
+
+</resources>

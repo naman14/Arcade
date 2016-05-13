@@ -276,11 +276,14 @@ function stylize(params)
             local disp = deprocess(img:double())
             disp = image.minmax { tensor = disp, min = 0, max = 1 }
             local filename = build_filename(params.output_image, t)
+            local isFinal = false;
             if t == params.num_iterations then
+                isFinal = true;
                 filename = params.output_image
             end
             updateProgress("Saving image")
             image.save(filename, disp)
+--            onImageSaved(filename, isFinal)
         end
     end
 
@@ -317,7 +320,7 @@ function stylize(params)
         updateProgress('Running optimization with ADAM')
         for t = 1, params.num_iterations do
             updateProgress(string.format("Doing Iteration %i of %s ...", t, params.num_iterations))
---            updateIteration(t, params.num_iterations)
+            --            updateIteration(t, params.num_iterations)
             local x, losses = optim.adam(feval, img, optim_state)
         end
         updateProgress("Done")

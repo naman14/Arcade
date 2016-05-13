@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="General">
+
+        <ListPreference
+            android:defaultValue="128"
+            android:entries="@array/pref_image_size_entries"
+            android:entryValues="@array/pref_image_size_values"
+            android:key="preference_image_size"
+            android:summary="The size of the output image to be generated"
+            android:title="Output Image Size" />
+
+        <Preference
+            android:defaultValue="15"
+            android:key="preference_iterations"
+            android:title="Number of iterations" />
+
+        <Preference
+            android:defaultValue="200"
+            android:key="preference_style_weight"
+            android:title="Style weight" />
+
+        <Preference
+            android:defaultValue="20"
+            android:key="preference_content_weight"
+            android:title="Content weight" />
+
+        <Preference
+            android:key="preference_defaults"
+            android:title="Reset to defaults" />
+
+    </PreferenceCategory>
+</PreferenceScreen>

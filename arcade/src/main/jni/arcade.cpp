@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "torchandroid.h"
 #include <assert.h>
+#include <android/log.h>
 
 extern "C" {
 
@@ -48,7 +49,6 @@ static void onImageSaved(lua_State *L) {
 
 //called from lua
 static void onIterationUpdate(lua_State *L) {
-
     int n = lua_gettop(L);
     int i;
 
