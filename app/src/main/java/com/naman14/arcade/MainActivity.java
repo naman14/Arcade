@@ -3,6 +3,7 @@ package com.naman14.arcade;
 import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,7 @@ import android.widget.Toast;
 
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
+import com.naman14.arcade.library.ArcadeUtils;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int STATE_BEGIN_STYLING = 3;
     private static final int STATE_STYLING = 4;
 
+    public boolean downloadingModel = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         builder = new ArcadeBuilder(MainActivity.this);
+        checkModelExists();
 
         style.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,11 +124,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentState = STATE_STYLING;
-                animateViewVisiblity(styleImagePreview, false);
-                animateViewVisiblity(start, false);
-                animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#11000000"));
-                beginStyling();
+                if (checkModelExists()) {
+                    currentState = STATE_STYLING;
+                    animateViewVisiblity(styleImagePreview, false);
+                    animateViewVisiblity(start, false);
+                    animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#11000000"));
+                    beginStyling();
+                }
             }
         });
 
@@ -218,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
 
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -473,6 +482,62 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 return false;
             }
         } else return true;
+    }
+
+    private boolean checkModelExists() {
+        boolean b = ArcadeUtils.modelExists() && Utils.getModelsDownloaded(this);
+        if (!b) {
+            Utils.setModelsDownloaded(this, false);
+            if (!downloadingModel)
+                showModelDownloadDialog();
+            else
+                Toast.makeText(MainActivity.this, "Models are being downloaded", Toast.LENGTH_SHORT).show();
+        }
+        return b;
+    }
+
+    private void showModelDownloadDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Download required models");
+        dialog.setMessage("Arcade will need to download additional file models to work.\n(Size ~ 30MB)");
+        dialog.setCancelable(true);
+        dialog.setPositiveButton("Download", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if (checkPermission()) {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                downloadingModel = true;
+                                new ModelDownloader().run(MainActivity.this);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "Downloading models", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                downloadingModel = false;
+                                e.printStackTrace();
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(MainActivity.this, "Error downloading models", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                            return null;
+                        }
+
+                    }.execute();
+                }
+            }
+        });
+        dialog.create().show();
+
     }
 
     @Override

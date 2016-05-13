@@ -2,11 +2,9 @@ package com.naman14.arcade;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.naman14.arcade.library.ArcadeUtils;
 import com.squareup.okhttp.Call;
@@ -34,23 +32,25 @@ import okio.Source;
 
 public final class ModelDownloader {
 
-    private static final String MODEL_URL = "https://doc-0s-34-docs.googleusercontent.com/docs/securesc/ha0ro937gcuc7l7deffksulhg5h7mbp1/95032gs550lk93d936h1g9vn3m510q7u/1462996800000/03260806549380044353/*/0B0IedYUunOQIdGRWOG5kRXpldFk?e=download";
-    private static final String PROTO_URL = "https://drive.google.com/uc?id=0B0IedYUunOQIcTBtTzAxaU1GZUE&export=download";
+    private static final String MODEL_URL = "https://dl.dropbox.com/s/b9mmzkke7rst94y/nin_imagenet_conv.caffemodel?dl=1";
+    private static final String PROTO_URL = "https://drive.google.com/uc?export=download&id=0ByTrPZ8aLNaddklKTUozZFBKTlE";
 
-    private Call modelCall;
-    private Call protoCall;
 
-    public void run(Context context) throws Exception {
+    public void run(final Context context) throws Exception {
 
-        final Notificationhelper notificationhelper = new Notificationhelper(context, "Downloading models");
+        Utils.deleteModels();
+        final Notificationhelper notificationhelper = new Notificationhelper(context);
 
         final ProgressListener progressListener = new ProgressListener() {
             @Override
             public void update(long bytesRead, long contentLength, boolean done) {
                 if (done) {
                     notificationhelper.completed();
+                    Utils.setModelsDownloaded(context, true);
+                    Log.d("lol","here");
+                    ((MainActivity) context).downloadingModel = false;
                 }
-                notificationhelper.progressUpdate((int) bytesRead, (int) contentLength);
+                notificationhelper.progressUpdate((int) bytesRead / 1024, (int) contentLength / 1024);
             }
         };
 
@@ -69,9 +69,9 @@ public final class ModelDownloader {
                 .url(PROTO_URL)
                 .build();
 
-        notificationhelper.createNotification(1232, "Downlaoding models");
+        notificationhelper.createNotification(1232, "Downloading models");
 
-        protoCall = new OkHttpClient().newCall(request1);
+        Call protoCall = new OkHttpClient().newCall(request1);
         Response response1 = protoCall.execute();
         if (!response1.isSuccessful()) throw new IOException("Unexpected code " + response1);
 
@@ -86,8 +86,8 @@ public final class ModelDownloader {
                 .build();
 
         notificationhelper.clearNotification();
-        notificationhelper.createNotification(1232, "Downlaoding models");
-        modelCall = client.newCall(request2);
+        notificationhelper.createNotification(1332, "Downloading models");
+        Call modelCall = client.newCall(request2);
         Response response2 = modelCall.execute();
         if (!response1.isSuccessful()) throw new IOException("Unexpected code " + response2);
 
@@ -101,7 +101,7 @@ public final class ModelDownloader {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
 
             OutputStream stream = new BufferedOutputStream(fileOutputStream);
-            int bufferSize = 1024;
+            int bufferSize = 1024 * 50;
             byte[] buffer = new byte[bufferSize];
             int len = 0;
             while ((len = inputStream.read(buffer)) != -1) {
@@ -156,13 +156,22 @@ public final class ModelDownloader {
         private Source source(Source source) {
             return new ForwardingSource(source) {
                 long totalBytesRead = 0L;
+                long lastByteRead = 0L;
 
                 @Override
                 public long read(Buffer sink, long byteCount) throws IOException {
                     long bytesRead = super.read(sink, byteCount);
                     // read() returns the number of bytes read, or -1 if this source is exhausted.
                     totalBytesRead += bytesRead != -1 ? bytesRead : 0;
-                    progressListener.update(totalBytesRead, responseBody.contentLength(), bytesRead == -1);
+
+                    if (bytesRead == -1) {
+                        progressListener.update(totalBytesRead, responseBody.contentLength(), true);
+                    } else {
+                        if (totalBytesRead - lastByteRead > 1024 * 150) {
+                            progressListener.update(totalBytesRead, responseBody.contentLength(), false);
+                            lastByteRead = totalBytesRead;
+                        }
+                    }
                     return bytesRead;
                 }
             };
@@ -177,18 +186,11 @@ public final class ModelDownloader {
 
         private Context mContext;
         private int NOTIFICATION_ID = 1;
-        private NotificationCompat mNotification;
         private NotificationManager mNotificationManager;
-        private PendingIntent mContentIntent;
-        private CharSequence mContentTitle;
         NotificationCompat.Builder builder;
-        private String title;
-        CharSequence tickerText;
-        int icon;
 
-        public Notificationhelper(Context context, String title) {
+        public Notificationhelper(Context context) {
             mContext = context;
-            this.title = title;
         }
 
         public void createNotification(int newtask, String title) {
@@ -199,20 +201,10 @@ public final class ModelDownloader {
 
             builder = new NotificationCompat.Builder(mContext);
 
-            Intent intent = new Intent(mContext, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 1, intent, 0);
-
-            Intent buttonIntent = new Intent(mContext, ButtonReceiver.class);
-            buttonIntent.putExtra("notificationId", NOTIFICATION_ID);
-
-            PendingIntent btPendingIntent = PendingIntent.getBroadcast(mContext, 0, buttonIntent, 0);
-
             builder.setAutoCancel(false);
             builder.setContentTitle(title);
             builder.setSmallIcon(R.mipmap.ic_launcher);
-            builder.setContentIntent(pendingIntent);
-            builder.addAction(R.drawable.ic_close_black_24dp, "Cancel", btPendingIntent);
-            builder.setOngoing(true);
+            builder.setOngoing(false);
             builder.setWhen(Calendar.getInstance().getTimeInMillis());
             builder.build();
 
@@ -229,31 +221,15 @@ public final class ModelDownloader {
 
         public void completed() {
             builder.setContentTitle("Download completed");
+            builder.setContentText("Models have been downloaded");
             builder.setOngoing(false);
+            builder.mActions.clear();
             builder.setProgress(100, 100, false);
             mNotificationManager.notify(NOTIFICATION_ID, builder.build());
         }
 
         public void clearNotification() {
             mNotificationManager.cancel(NOTIFICATION_ID);
-        }
-    }
-
-    public class ButtonReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            int notificationId = intent.getIntExtra("notificationId", 0);
-
-            if (!protoCall.isCanceled()) {
-                protoCall.cancel();
-            }
-            if (!modelCall.isCanceled()) {
-                modelCall.cancel();
-            }
-            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.cancel(notificationId);
         }
     }
 }

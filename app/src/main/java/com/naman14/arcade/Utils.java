@@ -1,14 +1,14 @@
 package com.naman14.arcade;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
-import android.os.Environment;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.naman14.arcade.library.ArcadeUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,6 +48,26 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static void deleteModels() {
+        File dir = new File(ArcadeUtils.getModelsDirectory());
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                new File(dir, children[i]).delete();
+            }
+        }
+    }
+
+    public static void setModelsDownloaded(Context context, boolean downloaded) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putBoolean("models_downloaded", downloaded).apply();
+    }
+
+    public static boolean getModelsDownloaded(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean("models_downloaded", false);
     }
 
 
