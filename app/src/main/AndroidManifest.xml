@@ -27,6 +27,9 @@
         <activity
             android:name=".SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <service android:name=".ArcadeService"
+            android:exported="false"/>
     </application>
 
 </manifest>

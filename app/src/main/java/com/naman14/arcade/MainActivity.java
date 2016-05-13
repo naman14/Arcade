@@ -5,7 +5,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,7 +22,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,11 +31,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
 import com.naman14.arcade.library.ArcadeUtils;
-import com.naman14.arcade.library.listeners.IterationListener;
-import com.naman14.arcade.library.listeners.ProgressListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -74,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int STATE_STYLING = 4;
 
     public boolean downloadingModel = false;
+
+    private String contentPath;
+    private String stylePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,42 +159,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void beginStyling() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        builder.setModelFile(ArcadeUtils.getModelPath());
-        builder.setProtoFIle(ArcadeUtils.getProtoPath());
-        builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
-        builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
-        builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
-        builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Arcade arcade = builder.build();
-                arcade.initialize();
-                arcade.setLogEnabled(true);
-                setupLogFragment();
-                arcade.setProgressListener(new ProgressListener() {
-                    @Override
-                    public void onUpdateProgress(final String log, int currentIteration, int totalIterations) {
-                        if (logFragment != null)
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    logFragment.addLog(log);
-                                }
-                            });
-                    }
-                });
-                arcade.setIterationListener(new IterationListener() {
-                    @Override
-                    public void onIteration(int currentIteration, int totalIteration) {
-                        Log.d("iterations", String.valueOf(currentIteration) + " of " + String.valueOf(totalIteration));
-                    }
-                });
-                arcade.stylize();
-                return null;
-            }
-        }.execute();
+        setupLogFragment();
+        Intent intent = new Intent(this, ArcadeService.class);
+        intent.putExtra("style_path", stylePath);
+        intent.putExtra("content_path", contentPath);
+        startService(intent);
 
     }
 
@@ -280,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 case PICK_STYLE_IMAGE:
                     currentState = STATE_BEGIN_STYLING;
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    builder.setStyleimage(filePath);
+                    stylePath = filePath;
                     ImageLoader.getInstance().displayImage(Uri.fromFile(new File(filePath)).toString(), styleImagePreview, options);
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -294,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                     break;
                 case PICK_CONTENT_IMAGE:
-                    builder.setContentImage(filePath);
+                    contentPath = filePath;
                     content.setVisibility(View.GONE);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                     currentState = STATE_STYLE_CHOOSE;
@@ -459,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                builder.setStyleimage(result);
+                stylePath = result;
                 hideStyleImages();
                 moveStyleButton(false);
                 animateViewVisiblity(start, true);
