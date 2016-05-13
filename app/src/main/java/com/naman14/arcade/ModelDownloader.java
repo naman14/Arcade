@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.naman14.arcade.library.ArcadeUtils;
 import com.squareup.okhttp.Call;
@@ -47,7 +46,6 @@ public final class ModelDownloader {
                 if (done) {
                     notificationhelper.completed();
                     Utils.setModelsDownloaded(context, true);
-                    Log.d("lol","here");
                     ((MainActivity) context).downloadingModel = false;
                 }
                 notificationhelper.progressUpdate((int) bytesRead / 1024, (int) contentLength / 1024);

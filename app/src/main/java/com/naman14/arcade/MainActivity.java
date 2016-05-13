@@ -162,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void beginStyling() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        builder.setModelFile(ArcadeUtils.getModelPath());
+        builder.setProtoFIle(ArcadeUtils.getProtoPath());
         builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
         builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
         builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
