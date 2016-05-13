@@ -8,23 +8,31 @@
             android:entries="@array/pref_image_size_entries"
             android:entryValues="@array/pref_image_size_values"
             android:key="preference_image_size"
-            android:summary="The size of the output image to be generated"
+            android:summary="%s"
             android:title="Output Image Size" />
 
-        <Preference
+        <EditTextPreference
             android:defaultValue="15"
+            android:inputType="numberSigned"
             android:key="preference_iterations"
             android:title="Number of iterations" />
 
-        <Preference
+        <EditTextPreference
             android:defaultValue="200"
+            android:inputType="numberSigned"
             android:key="preference_style_weight"
             android:title="Style weight" />
 
-        <Preference
+        <EditTextPreference
             android:defaultValue="20"
+            android:inputType="numberSigned"
             android:key="preference_content_weight"
             android:title="Content weight" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="preference_logs"
+            android:title="Show full logs" />
 
         <Preference
             android:key="preference_defaults"

@@ -115,12 +115,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         builder = new ArcadeBuilder(MainActivity.this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        builder.setImageSize(preferences.getInt("preference_image_size", 128));
-        builder.setIterations(preferences.getInt("preference_iterations", 15));
-        builder.setContentWeight(preferences.getInt("preference_content_weight", 20));
-        builder.setStyleWeight(preferences.getInt("preference_style_weight", 200));
+        builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
+        builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
+        builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
+        builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
 
 
     }

@@ -1,19 +1,18 @@
 package com.naman14.arcade;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.EditText;
 
 /**
  * Created by naman on 13/05/16.
@@ -48,34 +47,25 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.preferences);
 
             preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            findPreference("preference_iterations").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    showEditDialog(getActivity(), preferences, "Number of iterations", "Iterations", "preference_iterations");
-                    return true;
-                }
-            });
-            findPreference("preference_style_weight").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    showEditDialog(getActivity(), preferences, "Style weight", "Style weight", "preference_style_weight");
-                    return true;
-                }
-            });
-            findPreference("preference_content_weight").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    showEditDialog(getActivity(), preferences, "Content weight", "Content weight", "preference_content_weight");
-                    return true;
-                }
-            });
+            preferences.registerOnSharedPreferenceChangeListener(this);
+            findPreference("preference_iterations").setSummary(preferences.getString("preference_iterations", "15"));
+            findPreference("preference_style_weight").setSummary(preferences.getString("preference_style_weight", "200"));
+            findPreference("preference_content_weight").setSummary(preferences.getString("preference_content_weight", "20"));
+
             findPreference("preference_defaults").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    preferences.edit().putInt("preference_iterations", 15).apply();
-                    preferences.edit().putInt("preference_style_weight", 200).apply();
-                    preferences.edit().putInt("preference_content_weight", 20).apply();
-                    preferences.edit().putInt("preference_image_size", 128).apply();
+                    preferences.edit().putString("preference_iterations", "15").apply();
+                    preferences.edit().putString("preference_style_weight", "200").apply();
+                    preferences.edit().putString("preference_content_weight", "20").apply();
+                    preferences.edit().putString("preference_image_size", "128").apply();
+                    preferences.edit().putBoolean("preference_logs", false).apply();
+                    findPreference("preference_iterations").setSummary(preferences.getString("preference_iterations", "15"));
+                    findPreference("preference_style_weight").setSummary(preferences.getString("preference_style_weight", "200"));
+                    findPreference("preference_content_weight").setSummary(preferences.getString("preference_content_weight", "20"));
+                    findPreference("preference_image_size").setSummary(preferences.getString("preference_image_size", "128"));
+                    ((SwitchPreference) findPreference("preference_logs")).setChecked(preferences.getBoolean("preference_logs", false));
+
                     return true;
                 }
             });
@@ -83,24 +73,16 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            findPreference(key).setSummary(String.valueOf(preferences.getInt(key, -1)));
+            Log.d("lol", "b;bfw;");
+            Preference p = findPreference(key);
+            if (p instanceof EditTextPreference) {
+                EditTextPreference editTextPref = (EditTextPreference) p;
+                Log.d("lodsbc", editTextPref.getText());
+                p.setSummary(editTextPref.getText());
+            } else if (p instanceof ListPreference) {
+                ListPreference listPref = (ListPreference) p;
+                p.setSummary(listPref.getSummary());
+            }
         }
-    }
-
-    private static void showEditDialog(Context context, final SharedPreferences preferences, String title, String hint, final String key) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-        alertDialog.setTitle(title);
-        final EditText input = new EditText(context);
-        input.setInputType(InputType.TYPE_NUMBER_FLAG_SIGNED);
-        input.setHint(hint);
-        input.setText(String.valueOf(preferences.getInt(key, -1)));
-        alertDialog.setView(input);
-        alertDialog.setPositiveButton("Save",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        preferences.edit().putInt(key, Integer.parseInt(input.getText().toString())).apply();
-                    }
-                });
-        alertDialog.show();
     }
 }
