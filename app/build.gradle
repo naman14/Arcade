@@ -39,6 +39,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
     compile 'com.google.code.gson:gson:2.3'
+    compile 'pub.devrel:easypermissions:0.1.5'
     compile project(':arcade')
 
 }

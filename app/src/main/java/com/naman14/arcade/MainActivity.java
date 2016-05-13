@@ -1,5 +1,6 @@
 package com.naman14.arcade;
 
+import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -44,8 +46,11 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     Button style, content, start;
     RecyclerView styleRecyclerView;
@@ -86,21 +91,27 @@ public class MainActivity extends AppCompatActivity {
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
+        builder = new ArcadeBuilder(MainActivity.this);
+
         style.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, PICK_STYLE_IMAGE);
+                if (checkPermission()) {
+                    Intent i = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(i, PICK_STYLE_IMAGE);
+                }
             }
         });
 
         content.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, PICK_CONTENT_IMAGE);
+                if (checkPermission()) {
+                    Intent i = new Intent(Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(i, PICK_CONTENT_IMAGE);
+                }
             }
         });
 
@@ -116,13 +127,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        builder = new ArcadeBuilder(MainActivity.this);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
-        builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
-        builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
-        builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
 
 
     }
@@ -149,6 +153,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void beginStyling() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
+        builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
+        builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
+        builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -453,4 +462,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            if (EasyPermissions.hasPermissions(this, perms)) {
+                return true;
+            } else {
+                EasyPermissions.requestPermissions(this, "Arcade needs to access device storage",
+                        111, perms);
+                return false;
+            }
+        } else return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> list) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> list) {
+
+    }
 }
