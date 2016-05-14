@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             stylingLog.setText(ArcadeService.currentLog);
         }
 
+        stylizedImage.setImageResource(R.drawable.shipwreck);
 
     }
 
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     FragmentManager manager = getSupportFragmentManager();
                     manager.beginTransaction().remove(manager.findFragmentById(R.id.log_container)).commit();
                 }
-                if (styleRecyclerView.getAdapter()==null)
+                if (styleRecyclerView.getAdapter() == null)
                     setStylesData();
                 showStyleImages();
                 moveStyleButton(true);
