@@ -20,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -242,9 +243,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 break;
             case STATE_STYLING_COMPLETED:
                 currentState = STATE_STYLE_CHOOSE;
-                animateViewVisiblity(styleImagePreview, false);
+                animateViewVisiblity(stylingResult, false);
                 animateViewVisiblity(start, false);
                 animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#44000000"));
+                if (logFragment != null) {
+                    FragmentManager manager = getSupportFragmentManager();
+                    manager.beginTransaction().remove(manager.findFragmentById(R.id.log_container)).commit();
+                }
                 showStyleImages();
                 moveStyleButton(true);
                 break;
@@ -588,6 +593,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter);
         IntentFilter intentFilter2 = new IntentFilter(ArcadeService.ACTION_COMPLETED);
         LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter2);
+        IntentFilter intentFilter3 = new IntentFilter(ArcadeService.ACTION_IMAGE_SAVED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter3);
     }
 
     private class ResponseReceiver extends BroadcastReceiver {
@@ -607,14 +614,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         stylingLog.setText(log);
                     }
                     break;
+                case ArcadeService.ACTION_IMAGE_SAVED:
+                    String path = intent.getStringExtra("path");
+                    DisplayImageOptions options1 = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(500)).build();
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(path)).toString(), stylingResult, options1);
+                    break;
                 case ArcadeService.ACTION_COMPLETED:
                     currentState = STATE_STYLING_COMPLETED;
                     serviceRunning = false;
                     hideLogoView(stylingView);
                     animateViewVisiblity(stylingResult, true);
-                    String outputPath = Environment.getExternalStorageDirectory() + "/Arcade/outputs.output.png";
-                    DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(500)).build();
-                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(outputPath)).toString(), stylingResult, options);
+                    String outputPath = Environment.getExternalStorageDirectory() + "/Arcade/outputs/output.png";
+                    DisplayImageOptions options2 = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(500)).build();
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(outputPath)).toString(), stylingResult, options2);
                     break;
             }
         }

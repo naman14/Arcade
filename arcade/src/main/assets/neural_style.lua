@@ -284,7 +284,7 @@ function stylize(params)
             updateProgress("Saving image")
             image.save(filename, disp)
             updateProgress(string.format("Image saved in %s ", filename))
-            --            onImageSaved(filename, isFinal)
+            onImageSaved(filename)
         end
     end
 

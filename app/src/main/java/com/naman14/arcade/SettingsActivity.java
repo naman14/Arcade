@@ -56,15 +56,16 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     preferences.edit().putString("preference_iterations", "15").apply();
+                    preferences.edit().putString("preference_save_iter", "5").apply();
                     preferences.edit().putString("preference_style_weight", "200").apply();
                     preferences.edit().putString("preference_content_weight", "20").apply();
-                    preferences.edit().putString("preference_image_size", "128").apply();
+                    preferences.edit().putString("preference_image_size", "256").apply();
                     preferences.edit().putBoolean("preference_logs", false).apply();
                     findPreference("preference_iterations").setSummary(preferences.getString("preference_iterations", "15"));
                     findPreference("preference_save_iter").setSummary(preferences.getString("preference_save_iter", "5"));
                     findPreference("preference_style_weight").setSummary(preferences.getString("preference_style_weight", "200"));
                     findPreference("preference_content_weight").setSummary(preferences.getString("preference_content_weight", "20"));
-                    findPreference("preference_image_size").setSummary(preferences.getString("preference_image_size", "128"));
+                    findPreference("preference_image_size").setSummary(preferences.getString("preference_image_size", "256"));
                     ((SwitchPreference) findPreference("preference_logs")).setChecked(preferences.getBoolean("preference_logs", true));
 
                     return true;

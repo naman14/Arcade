@@ -100,9 +100,9 @@ public class Arcade {
     }
 
     //Called from C
-    public static void onImageSaved(String path, boolean isFinal) {
+    public static void onImageSaved(String path) {
         if (imageSavedListener != null) {
-            imageSavedListener.onImageSaved(path, isFinal);
+            imageSavedListener.onImageSaved(path);
         }
     }
 

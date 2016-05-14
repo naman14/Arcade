@@ -5,5 +5,5 @@ package com.naman14.arcade.library.listeners;
  */
 public interface ImageSavedListener {
 
-    public void onImageSaved(String path, boolean isFinal);
+    public void onImageSaved(String path);
 }

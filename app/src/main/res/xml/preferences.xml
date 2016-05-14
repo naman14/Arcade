@@ -3,7 +3,7 @@
 
 
     <ListPreference
-        android:defaultValue="128"
+        android:defaultValue="256"
         android:entries="@array/pref_image_size_entries"
         android:entryValues="@array/pref_image_size_values"
         android:key="preference_image_size"

@@ -38,14 +38,13 @@ static void onImageSaved(lua_State *L) {
 
     size_t len;
     const char *path = lua_tolstring(L, 1, &len);
-    bool isFinal = lua_toboolean(L, 2);
 
     jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
     jmethodID onImageSaved = globalEnv->GetStaticMethodID(clazz, "onImageSaved",
-                                                          "(Ljava/lang/String;Z)V");
+                                                          "(Ljava/lang/String;)V");
 
     jstring pathString = globalEnv->NewStringUTF(path);
-    globalEnv->CallStaticVoidMethod(clazz, onImageSaved, pathString, isFinal);
+    globalEnv->CallStaticVoidMethod(clazz, onImageSaved, pathString);
     globalEnv->DeleteLocalRef(pathString);
     globalEnv->DeleteLocalRef(clazz);
 
