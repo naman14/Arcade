@@ -4,10 +4,6 @@
     "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/frida_kahlo.jpg"
   },
   {
-    "title": "Golden Gate",
-    "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/golden_gate.jpg"
-  },
-  {
     "title": "Pablo Picasso Self Portrait",
     "url": "https://raw.githubusercontent.com/jcjohnson/neural-style/master/examples/inputs/picasso_selfport1907.jpg"
   },

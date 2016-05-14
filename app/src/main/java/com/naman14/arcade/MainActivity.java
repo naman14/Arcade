@@ -178,6 +178,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             case R.id.action_settings:
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 break;
+            case R.id.action_about:
+                Utils.showAbout(this);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
