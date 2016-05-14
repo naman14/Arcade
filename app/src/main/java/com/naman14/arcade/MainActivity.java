@@ -250,6 +250,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     FragmentManager manager = getSupportFragmentManager();
                     manager.beginTransaction().remove(manager.findFragmentById(R.id.log_container)).commit();
                 }
+                if (styleRecyclerView.getAdapter()==null)
+                    setStylesData();
                 showStyleImages();
                 moveStyleButton(true);
                 break;
@@ -295,6 +297,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     outStream.flush();
                     outStream.close();
                     filePath = convertedImage.getAbsolutePath();
+                    File noMedia = new File(Environment.getExternalStorageDirectory() + "/Arcade/temp/.nomedia");
+                    if (!noMedia.exists())
+                        noMedia.createNewFile();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -476,6 +481,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                 out.flush();
                 out.close();
+                File noMedia = new File(Environment.getExternalStorageDirectory() + "/Arcade/inputs/.nomedia");
+                if (!noMedia.exists())
+                    noMedia.createNewFile();
 
             } catch (Exception e) {
                 e.printStackTrace();
