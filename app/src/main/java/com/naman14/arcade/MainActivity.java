@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             hideLogoView();
             animateViewVisiblity(stylingLog, true);
             beginStyling(true);
+            stylingLog.setText(ArcadeService.currentLog);
         }
 
 

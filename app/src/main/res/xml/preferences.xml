@@ -36,7 +36,7 @@
         android:title="Content weight" />
 
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="preference_logs"
         android:title="Show full logs" />
 

@@ -68,6 +68,17 @@ static void onIterationUpdate(lua_State *L) {
 
 }
 
+static void onCompleted(lua_State *L) {
+
+    jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
+    jmethodID onCompleted = globalEnv->GetStaticMethodID(clazz, "onCompleted",
+                                                         "(Ljava/lang/String;Z)V");
+
+    globalEnv->CallStaticVoidMethod(clazz, onCompleted, "");
+    globalEnv->DeleteLocalRef(clazz);
+
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_naman14_arcade_library_Arcade_initialize(JNIEnv *env,
                                                   jobject thiz,
@@ -243,6 +254,13 @@ Java_com_naman14_arcade_library_Arcade_setImageSavedListener(JNIEnv *env) {
     lua_CFunction function = (lua_CFunction) onImageSaved;
     lua_pushcfunction(L, function);
     lua_setglobal(L, "onImageSaved");
+}
+
+JNIEXPORT void JNICALL
+Java_com_naman14_arcade_library_Arcade_setCompletionListener(JNIEnv *env) {
+    lua_CFunction function = (lua_CFunction) onCompleted;
+    lua_pushcfunction(L, function);
+    lua_setglobal(L, "onCompleted");
 }
 
 

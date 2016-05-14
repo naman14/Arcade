@@ -11,7 +11,6 @@ import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 /**
@@ -66,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity {
                     findPreference("preference_style_weight").setSummary(preferences.getString("preference_style_weight", "200"));
                     findPreference("preference_content_weight").setSummary(preferences.getString("preference_content_weight", "20"));
                     findPreference("preference_image_size").setSummary(preferences.getString("preference_image_size", "128"));
-                    ((SwitchPreference) findPreference("preference_logs")).setChecked(preferences.getBoolean("preference_logs", false));
+                    ((SwitchPreference) findPreference("preference_logs")).setChecked(preferences.getBoolean("preference_logs", true));
 
                     return true;
                 }

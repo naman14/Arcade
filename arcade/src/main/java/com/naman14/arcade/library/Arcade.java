@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.content.pm.ApplicationInfo;
 import android.content.Context;
 
+import com.naman14.arcade.library.listeners.CompletionListener;
 import com.naman14.arcade.library.listeners.ImageSavedListener;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
@@ -23,6 +24,7 @@ public class Arcade {
     static ProgressListener progressListener;
     static IterationListener iterationListener;
     static ImageSavedListener imageSavedListener;
+    static CompletionListener completionListener;
 
     static {
         System.loadLibrary("png16");
@@ -71,6 +73,11 @@ public class Arcade {
         this.imageSavedListener = listener;
     }
 
+    public void setCompletionListsner(CompletionListener listsner) {
+        setCompletionListener();
+        this.completionListener = listsner;
+    }
+
     public void setLogEnabled(boolean enabled) {
         this.logEnabled = enabled;
     }
@@ -99,6 +106,13 @@ public class Arcade {
         }
     }
 
+    //Called from C
+    public static void onCompleted(String empty) {
+        if (completionListener != null) {
+            completionListener.onComplete();
+        }
+    }
+
     // native method
     private native String initialize(AssetManager manager, String path, String luafile);
 
@@ -116,5 +130,7 @@ public class Arcade {
     private native void setIterationListener();
 
     private native void setImageSavedListener();
+
+    private native void setCompletionListener();
 
 }

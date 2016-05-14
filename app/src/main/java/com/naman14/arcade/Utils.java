@@ -72,7 +72,7 @@ public class Utils {
 
     public static boolean getFullLogsEnabled(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getBoolean("preference_logs", false);
+        return preferences.getBoolean("preference_logs", true);
     }
 
 

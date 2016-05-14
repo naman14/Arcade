@@ -10,6 +10,7 @@ import android.util.Log;
 import com.naman14.arcade.library.Arcade;
 import com.naman14.arcade.library.ArcadeBuilder;
 import com.naman14.arcade.library.ArcadeUtils;
+import com.naman14.arcade.library.listeners.CompletionListener;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
 
@@ -22,6 +23,7 @@ public class ArcadeService extends IntentService {
     public static final String ACTION_UPDATE_PROGRESS = "com.naman14.arcade.UPDATE_PROGRESS";
 
     public static boolean isRunning;
+    public static String currentLog;
 
     public ArcadeService() {
         super("ArcadeService");
@@ -46,7 +48,7 @@ public class ArcadeService extends IntentService {
         builder.setSaveIterations(Integer.parseInt(preferences.getString("preference_save_iter", "5")));
         builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
         builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
-        Arcade arcade = builder.build();
+        final Arcade arcade = builder.build();
         arcade.initialize();
         arcade.setLogEnabled(true);
         arcade.setProgressListener(new ProgressListener() {
@@ -56,12 +58,22 @@ public class ArcadeService extends IntentService {
                 localIntent.putExtra("log", log);
                 localIntent.putExtra("important", important);
                 LocalBroadcastManager.getInstance(ArcadeService.this).sendBroadcast(localIntent);
+                if (important)
+                    currentLog = log;
             }
         });
         arcade.setIterationListener(new IterationListener() {
             @Override
             public void onIteration(int currentIteration, int totalIteration) {
                 Log.d("iterations", String.valueOf(currentIteration) + " of " + String.valueOf(totalIteration));
+            }
+        });
+        arcade.setCompletionListsner(new CompletionListener() {
+            @Override
+            public void onComplete() {
+                arcade.destroyArcade();
+                isRunning = false;
+                stopSelf();
             }
         });
         arcade.stylize();

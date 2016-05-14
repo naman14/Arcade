@@ -325,6 +325,7 @@ function stylize(params)
             local x, losses = optim.adam(feval, img, optim_state)
         end
         updateProgress("Done")
+        onCompleted()
     end
 end
 
