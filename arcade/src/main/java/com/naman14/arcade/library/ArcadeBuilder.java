@@ -40,7 +40,7 @@ public class ArcadeBuilder {
         this.gpu = -1;
         this.styleimage = "/sdcard/examples/inputs/starry_night_crop.png";
         this.contentImage = "/sdcard/examples/outputs/golden_gate_scream.png";
-        this.outputImage = "/storage/emulated/0/Arcade/output.png";
+        this.outputImage = "/storage/emulated/0/Arcade/outputs/output.png";
         this.iterations = 40;
         this.backend = "nn";
         this.optimizer = "adam";

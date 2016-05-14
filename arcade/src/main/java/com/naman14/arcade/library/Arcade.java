@@ -1,5 +1,6 @@
 package com.naman14.arcade.library;
 
+import android.os.Environment;
 import android.util.Log;
 import android.content.res.AssetManager;
 import android.content.pm.ApplicationInfo;
@@ -8,6 +9,8 @@ import android.content.Context;
 import com.naman14.arcade.library.listeners.ImageSavedListener;
 import com.naman14.arcade.library.listeners.IterationListener;
 import com.naman14.arcade.library.listeners.ProgressListener;
+
+import java.io.File;
 
 public class Arcade {
 
@@ -37,6 +40,11 @@ public class Arcade {
     }
 
     public void stylize() {
+        File myDir = new File(Environment.getExternalStorageDirectory() + "/Arcade/outputs");
+
+        if (!myDir.exists())
+            myDir.mkdirs();
+
         stylize(builder.styleimage, builder.contentImage, builder.outputImage, builder.gpu, builder.iterations, builder.imageSize,
                 builder.optimizer, builder.modelFile, builder.protoFIle, builder.backend, builder.styleScale, builder.styleBlendWeights,
                 builder.styleLayers, builder.contentLayers, builder.pooling, builder.tvWeight, builder.styleWeight, builder.contentWeight,

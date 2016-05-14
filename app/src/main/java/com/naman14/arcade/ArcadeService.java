@@ -32,6 +32,7 @@ public class ArcadeService extends IntentService {
         builder.setProtoFIle(ArcadeUtils.getProtoPath());
         builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
         builder.setIterations(Integer.parseInt(preferences.getString("preference_iterations", "15")));
+        builder.setSaveIterations(Integer.parseInt(preferences.getString("preference_save_iter", "5")));
         builder.setContentWeight(Integer.parseInt(preferences.getString("preference_content_weight", "20")));
         builder.setStyleWeight(Integer.parseInt(preferences.getString("preference_style_weight", "200")));
         Arcade arcade = builder.build();

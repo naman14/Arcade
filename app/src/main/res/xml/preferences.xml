@@ -18,6 +18,13 @@
             android:title="Number of iterations" />
 
         <EditTextPreference
+            android:defaultValue="5"
+            android:hint="0 for saving only final image"
+            android:inputType="numberSigned"
+            android:key="preference_save_iter"
+            android:title="Save image after iterations" />
+
+        <EditTextPreference
             android:defaultValue="200"
             android:inputType="numberSigned"
             android:key="preference_style_weight"
