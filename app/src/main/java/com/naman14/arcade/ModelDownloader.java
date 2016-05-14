@@ -34,11 +34,13 @@ public final class ModelDownloader {
     private static final String MODEL_URL = "https://dl.dropbox.com/s/b9mmzkke7rst94y/nin_imagenet_conv.caffemodel?dl=1";
     private static final String PROTO_URL = "https://drive.google.com/uc?export=download&id=0ByTrPZ8aLNaddklKTUozZFBKTlE";
 
+    private Notificationhelper notificationhelper;
 
     public void run(final Context context) throws Exception {
 
         Utils.deleteModels();
         final Notificationhelper notificationhelper = new Notificationhelper(context);
+        this.notificationhelper = notificationhelper;
 
         final ProgressListener progressListener = new ProgressListener() {
             @Override
@@ -108,8 +110,10 @@ public final class ModelDownloader {
             if (stream != null)
                 stream.close();
         } catch (FileNotFoundException e) {
+            notificationhelper.errorNotification();
             e.printStackTrace();
         } catch (IOException e) {
+            notificationhelper.errorNotification();
             e.printStackTrace();
         }
     }
@@ -201,7 +205,7 @@ public final class ModelDownloader {
 
             builder.setAutoCancel(false);
             builder.setContentTitle(title);
-            builder.setSmallIcon(R.mipmap.ic_launcher);
+            builder.setSmallIcon(R.drawable.ic_stat_download);
             builder.setOngoing(false);
             builder.setWhen(Calendar.getInstance().getTimeInMillis());
             builder.build();
@@ -223,6 +227,11 @@ public final class ModelDownloader {
             builder.setOngoing(false);
             builder.mActions.clear();
             builder.setProgress(100, 100, false);
+            mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+        }
+
+        public void errorNotification() {
+            builder.setContentTitle("Error downloading models");
             mNotificationManager.notify(NOTIFICATION_ID, builder.build());
         }
 
