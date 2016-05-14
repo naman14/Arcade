@@ -101,13 +101,7 @@
         android:paddingBottom="5dp"
         android:visibility="invisible" />
 
-    <FrameLayout
-        android:id="@+id/log_container"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/status_bar_margin" />
+    <include layout="@layout/layout_styling" />
 
     <LinearLayout
         android:id="@+id/logoView"

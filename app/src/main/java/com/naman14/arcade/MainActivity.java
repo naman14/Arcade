@@ -50,11 +50,11 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
-    Button style, content, start;
+    Button style, content, start, stop;
     RecyclerView styleRecyclerView;
     ImageView stylizedImage, styleImagePreview;
     View foregroundView, logoView;
-    TextView styleButtonText;
+    TextView styleButtonText, stylingLog;
 
     private static final int PICK_STYLE_IMAGE = 777;
     private static final int PICK_CONTENT_IMAGE = 888;
@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         foregroundView = findViewById(R.id.foregroundView);
         logoView = findViewById(R.id.logoView);
         styleButtonText = (TextView) findViewById(R.id.pickStyleText);
+        stop = (Button) findViewById(R.id.stopStyling);
+        stylingLog = (TextView) findViewById(R.id.stylingLog);
 
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -159,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void beginStyling() {
-        setupLogFragment();
+        if (Utils.getFullLogsEnabled(this))
+            setupLogFragment();
         Intent intent = new Intent(this, ArcadeService.class);
         intent.putExtra("style_path", stylePath);
         intent.putExtra("content_path", contentPath);

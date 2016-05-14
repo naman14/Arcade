@@ -25,6 +25,7 @@ static void onProgressUpdate(lua_State *L) {
 
     jstring logString = globalEnv->NewStringUTF(log);
     globalEnv->CallStaticVoidMethod(clazz, onProgressUpdate, logString);
+    globalEnv->DeleteLocalRef(logString);
 
 }
 
@@ -44,6 +45,7 @@ static void onImageSaved(lua_State *L) {
 
     jstring pathString = globalEnv->NewStringUTF(path);
     globalEnv->CallStaticVoidMethod(clazz, onImageSaved, pathString, isFinal);
+    globalEnv->DeleteLocalRef(pathString);
 
 }
 

@@ -70,5 +70,10 @@ public class Utils {
         return preferences.getBoolean("models_downloaded", false);
     }
 
+    public static boolean getFullLogsEnabled(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getBoolean("preference_logs", false);
+    }
+
 
 }
