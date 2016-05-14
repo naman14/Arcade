@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.naman14.arcade.library.Arcade;
@@ -17,6 +18,10 @@ import com.naman14.arcade.library.listeners.ProgressListener;
  */
 public class ArcadeService extends IntentService {
 
+    public static final String ACTION_START = "com.naman14.arcade.START";
+    public static final String ACTION_UPDATE_PROGRESS = "com.naman14.arcade.UPDATE_PROGRESS";
+
+    public static boolean isRunning;
 
     public ArcadeService() {
         super("ArcadeService");
@@ -24,10 +29,16 @@ public class ArcadeService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        isRunning = true;
+        beginStyling(intent.getStringExtra("style_path"), intent.getStringExtra("content_path"));
+    }
+
+
+    private void beginStyling(String stylePath, String contentPath) {
         ArcadeBuilder builder = new ArcadeBuilder(this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        builder.setStyleimage(intent.getStringExtra("style_path"));
-        builder.setContentImage(intent.getStringExtra("content_path"));
+        builder.setStyleimage(stylePath);
+        builder.setContentImage(contentPath);
         builder.setModelFile(ArcadeUtils.getModelPath());
         builder.setProtoFIle(ArcadeUtils.getProtoPath());
         builder.setImageSize(Integer.parseInt(preferences.getString("preference_image_size", "128")));
@@ -40,14 +51,11 @@ public class ArcadeService extends IntentService {
         arcade.setLogEnabled(true);
         arcade.setProgressListener(new ProgressListener() {
             @Override
-            public void onUpdateProgress(final String log, int currentIteration, int totalIterations) {
-//                if (logFragment != null)
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            logFragment.addLog(log);
-//                        }
-//                    });
+            public void onUpdateProgress(final String log, boolean important) {
+                Intent localIntent = new Intent(ACTION_UPDATE_PROGRESS);
+                localIntent.putExtra("log", log);
+                localIntent.putExtra("important", important);
+                LocalBroadcastManager.getInstance(ArcadeService.this).sendBroadcast(localIntent);
             }
         });
         arcade.setIterationListener(new IterationListener() {

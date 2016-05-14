@@ -3,8 +3,11 @@ package com.naman14.arcade;
 import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +20,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,7 +54,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
-    Button style, content, start, stop;
+    Button style, content, start;
     RecyclerView styleRecyclerView;
     ImageView stylizedImage, styleImagePreview;
     View foregroundView, logoView;
@@ -67,11 +71,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int STATE_STYLE_CHOOSE = 2;
     private static final int STATE_BEGIN_STYLING = 3;
     private static final int STATE_STYLING = 4;
+    private static final int STATE_EXITING = 5;
 
     public boolean downloadingModel = false;
 
     private String contentPath;
     private String stylePath;
+
+    private Intent serviceIntent;
+    private boolean serviceRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         foregroundView = findViewById(R.id.foregroundView);
         logoView = findViewById(R.id.logoView);
         styleButtonText = (TextView) findViewById(R.id.pickStyleText);
-        stop = (Button) findViewById(R.id.stopStyling);
         stylingLog = (TextView) findViewById(R.id.stylingLog);
 
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
@@ -128,13 +135,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     currentState = STATE_STYLING;
                     animateViewVisiblity(styleImagePreview, false);
                     animateViewVisiblity(start, false);
-                    animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#11000000"));
-                    beginStyling();
+                    animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#99000000"));
+                    animateViewVisiblity(stylingLog, true);
+                    beginStyling(false);
                 }
             }
         });
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        if (ArcadeService.isRunning) {
+            animateViewVisiblity(content, false);
+            hideLogoView();
+            animateViewVisiblity(stylingLog, true);
+            beginStyling(true);
+        }
 
 
     }
@@ -160,13 +175,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return super.onOptionsItemSelected(item);
     }
 
-    private void beginStyling() {
-        if (Utils.getFullLogsEnabled(this))
+    private void beginStyling(boolean alreadyRunning) {
+        if (Utils.getFullLogsEnabled(this)) {
             setupLogFragment();
-        Intent intent = new Intent(this, ArcadeService.class);
-        intent.putExtra("style_path", stylePath);
-        intent.putExtra("content_path", contentPath);
-        startService(intent);
+        }
+        if (!alreadyRunning) {
+            serviceIntent = new Intent(this, ArcadeService.class);
+            serviceIntent.setAction(ArcadeService.ACTION_START);
+            serviceIntent.putExtra("style_path", stylePath);
+            serviceIntent.putExtra("content_path", contentPath);
+            startService(serviceIntent);
+        }
+        setupServiceReceiver();
+        serviceRunning = true;
 
     }
 
@@ -176,6 +197,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             case STATE_CONTENT_CHOOSE:
                 super.onBackPressed();
                 break;
+            case STATE_EXITING:
+                super.onBackPressed();
+                currentState = STATE_STYLING;
             case STATE_STYLE_CHOOSE:
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 currentState = STATE_CONTENT_CHOOSE;
@@ -194,6 +218,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 moveStyleButton(true);
                 break;
             case STATE_STYLING:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Exit");
+                builder.setMessage("Are you sure you want to exit?\nStyling will continue in background");
+                builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        currentState = STATE_EXITING;
+                        onBackPressed();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
                 break;
         }
 
@@ -527,5 +566,32 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
 
+    }
+
+    private void setupServiceReceiver() {
+        ResponseReceiver responseReceiver = new ResponseReceiver();
+        IntentFilter intentFilter = new IntentFilter(ArcadeService.ACTION_UPDATE_PROGRESS);
+        LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter);
+    }
+
+    private class ResponseReceiver extends BroadcastReceiver {
+
+        private ResponseReceiver() {
+        }
+
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ArcadeService.ACTION_UPDATE_PROGRESS:
+                    String log = intent.getStringExtra("log");
+                    boolean important = intent.getBooleanExtra("important", true);
+                    if (logFragment != null) {
+                        logFragment.addLog(log);
+                    }
+                    if (important) {
+                        stylingLog.setText(log);
+                    }
+                    break;
+            }
+        }
     }
 }

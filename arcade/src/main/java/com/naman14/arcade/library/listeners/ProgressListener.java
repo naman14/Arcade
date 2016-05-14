@@ -5,5 +5,5 @@ package com.naman14.arcade.library.listeners;
  */
 public interface ProgressListener {
 
-    public void onUpdateProgress(String log, int currentIteration, int totalIterations);
+    public void onUpdateProgress(String log, boolean important);
 }

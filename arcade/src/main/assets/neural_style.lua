@@ -283,7 +283,7 @@ function stylize(params)
             end
             updateProgress("Saving image")
             image.save(filename, disp)
-            updateProgress("Image saved in %s", filename)
+            updateProgress("Image saved in %s ", filename)
             --            onImageSaved(filename, isFinal)
         end
     end

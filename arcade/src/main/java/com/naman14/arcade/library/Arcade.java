@@ -81,7 +81,7 @@ public class Arcade {
             Log.d("Arcade ", log);
         }
         if (progressListener != null) {
-            progressListener.onUpdateProgress(log, -1, -1);
+            progressListener.onUpdateProgress(log, true);
         }
     }
 
