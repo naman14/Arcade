@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     Button style, content, start;
     RecyclerView styleRecyclerView;
-    ImageView stylizedImage, styleImagePreview;
-    View foregroundView, logoView;
+    ImageView stylizedImage, styleImagePreview, stylingResult;
+    View foregroundView, logoView, stylingView;
     TextView styleButtonText, stylingLog;
 
     private static final int PICK_STYLE_IMAGE = 777;
@@ -71,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int STATE_STYLE_CHOOSE = 2;
     private static final int STATE_BEGIN_STYLING = 3;
     private static final int STATE_STYLING = 4;
-    private static final int STATE_EXITING = 5;
+    private static final int STATE_STYLING_COMPLETED = 5;
+    private static final int STATE_EXITING = 6;
 
     public boolean downloadingModel = false;
 
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         logoView = findViewById(R.id.logoView);
         styleButtonText = (TextView) findViewById(R.id.pickStyleText);
         stylingLog = (TextView) findViewById(R.id.stylingLog);
+        stylingResult = (ImageView) findViewById(R.id.stylingResultPreview);
+        stylingView = findViewById(R.id.stylingView);
 
         styleRecyclerView = (RecyclerView) findViewById(R.id.styles_recyclerview);
         styleRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -137,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     animateViewVisiblity(start, false);
                     animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#99000000"));
                     animateViewVisiblity(stylingLog, true);
+                    showLogoView(stylingView);
                     beginStyling(false);
                 }
             }
@@ -146,7 +150,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         if (ArcadeService.isRunning) {
             animateViewVisiblity(content, false);
-            hideLogoView();
+            hideLogoView(logoView);
+            showLogoView(stylingView);
             animateViewVisiblity(stylingLog, true);
             beginStyling(true);
             stylingLog.setText(ArcadeService.currentLog);
@@ -205,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 currentState = STATE_CONTENT_CHOOSE;
                 content.setVisibility(View.VISIBLE);
-                showLogoView();
+                showLogoView(logoView);
                 hideStyleImages();
                 moveStyleButton(false);
                 animateViewVisiblity(content, true);
@@ -234,6 +239,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         dialog.dismiss();
                     }
                 }).show();
+                break;
+            case STATE_STYLING_COMPLETED:
+                currentState = STATE_STYLE_CHOOSE;
+                animateViewVisiblity(styleImagePreview, false);
+                animateViewVisiblity(start, false);
+                animateForegroundView(Color.parseColor("#88000000"), Color.parseColor("#44000000"));
+                showStyleImages();
+                moveStyleButton(true);
                 break;
         }
 
@@ -314,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         public void run() {
                             setStylesData();
                             showStyleImages();
-                            hideLogoView();
+                            hideLogoView(logoView);
                             animateViewVisiblity(style, true);
                             moveStyleButton(true);
                         }
@@ -374,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .alpha(0.0f);
     }
 
-    private void hideLogoView() {
+    private void hideLogoView(View logoView) {
         logoView.setVisibility(View.VISIBLE);
         logoView.setAlpha(1.0f);
         logoView.animate()
@@ -383,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .alpha(0.0f);
     }
 
-    private void showLogoView() {
+    private void showLogoView(View logoView) {
         logoView.setVisibility(View.VISIBLE);
         logoView.setTranslationY(-logoView.getHeight());
         logoView.setAlpha(0.0f);
@@ -573,6 +586,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         ResponseReceiver responseReceiver = new ResponseReceiver();
         IntentFilter intentFilter = new IntentFilter(ArcadeService.ACTION_UPDATE_PROGRESS);
         LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter);
+        IntentFilter intentFilter2 = new IntentFilter(ArcadeService.ACTION_COMPLETED);
+        LocalBroadcastManager.getInstance(this).registerReceiver(responseReceiver, intentFilter2);
     }
 
     private class ResponseReceiver extends BroadcastReceiver {
@@ -591,6 +606,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     if (important) {
                         stylingLog.setText(log);
                     }
+                    break;
+                case ArcadeService.ACTION_COMPLETED:
+                    currentState = STATE_STYLING_COMPLETED;
+                    serviceRunning = false;
+                    hideLogoView(stylingView);
+                    animateViewVisiblity(stylingResult, true);
+                    String outputPath = Environment.getExternalStorageDirectory() + "/Arcade/outputs.output.png";
+                    DisplayImageOptions options = new DisplayImageOptions.Builder().displayer(new FadeInBitmapDisplayer(500)).build();
+                    ImageLoader.getInstance().displayImage(Uri.fromFile(new File(outputPath)).toString(), stylingResult, options);
                     break;
             }
         }

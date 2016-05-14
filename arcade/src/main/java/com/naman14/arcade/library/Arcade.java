@@ -107,7 +107,7 @@ public class Arcade {
     }
 
     //Called from C
-    public static void onCompleted(String empty) {
+    public static void onCompleted() {
         if (completionListener != null) {
             completionListener.onComplete();
         }

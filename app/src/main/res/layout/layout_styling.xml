@@ -11,21 +11,42 @@
         android:layout_centerInParent="true" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/stylingView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:layout_marginTop="65dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:text="styling..."
+            android:textColor="@android:color/white"
+            android:textSize="40sp" />
 
         <TextView
             android:id="@+id/stylingLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-condensed"
             android:gravity="center_horizontal"
             android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/log_container"

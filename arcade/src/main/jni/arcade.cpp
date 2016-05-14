@@ -72,9 +72,8 @@ static void onCompleted(lua_State *L) {
 
     jclass clazz = globalEnv->FindClass("com/naman14/arcade/library/Arcade");
     jmethodID onCompleted = globalEnv->GetStaticMethodID(clazz, "onCompleted",
-                                                         "(Ljava/lang/String;Z)V");
-
-    globalEnv->CallStaticVoidMethod(clazz, onCompleted, "");
+                                                         "()V");
+    globalEnv->CallStaticVoidMethod(clazz, onCompleted);
     globalEnv->DeleteLocalRef(clazz);
 
 }

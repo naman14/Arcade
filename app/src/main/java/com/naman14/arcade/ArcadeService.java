@@ -20,6 +20,7 @@ import com.naman14.arcade.library.listeners.ProgressListener;
 public class ArcadeService extends IntentService {
 
     public static final String ACTION_START = "com.naman14.arcade.START";
+    public static final String ACTION_COMPLETED = "com.naman14.arcade.COMPLETE";
     public static final String ACTION_UPDATE_PROGRESS = "com.naman14.arcade.UPDATE_PROGRESS";
 
     public static boolean isRunning;
@@ -71,7 +72,8 @@ public class ArcadeService extends IntentService {
         arcade.setCompletionListsner(new CompletionListener() {
             @Override
             public void onComplete() {
-                arcade.destroyArcade();
+                Intent localIntent = new Intent(ACTION_COMPLETED);
+                LocalBroadcastManager.getInstance(ArcadeService.this).sendBroadcast(localIntent);
                 isRunning = false;
                 stopSelf();
             }
